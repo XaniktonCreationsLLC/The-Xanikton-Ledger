@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xanikton Creations LLC Client Intake Form</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Tailwind config for extended colors -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'primary-bg': '#f8fafc', // Slate-50
+              'secondary-bg': '#e2e8f0', // Slate-200
+              'primary-text': '#1e293b', // Slate-800
+              'secondary-text': '#475569', // Slate-600
+              'accent-500': '#3b82f6', // Blue-500
+              'accent-600': '#2563eb', // Blue-600
+              'accent-100': '#dbeafe', // Blue-100
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Basic styles to ensure form looks good and errors are clear */
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      }
+      .error-message {
+        color: #ef4444; /* Red-500 */
+        font-size: 0.875rem; /* text-sm */
+        margin-top: 0.25rem;
+      }
+      .input-error {
+        border-color: #ef4444; /* Red-500 */
+      }
+      .input-error:focus {
+        --tw-ring-color: #ef4444;
+        --tw-border-color: #ef4444;
+      }
+      .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
+      }
+
+      /* Print styles */
+      @media print {
+        body {
+          background-color: #fff;
+        }
+        .form-container {
+          box-shadow: none;
+          border: none;
+          max-width: none;
+          padding: 0;
+        }
+        header {
+          text-align: left;
+          margin-bottom: 20px;
+        }
+        h1 {
+          font-size: 1.5rem !important;
+          margin-bottom: 5px !important;
+        }
+        header p {
+          font-size: 0.875rem !important;
+          max-width: none !important;
+        }
+        .form-actions {
+          display: none; /* Hide buttons when printing */
+        }
+        #autosaveVisual, #submissionSuccessMessage {
+            display: none !important; /* Hide notifications when printing */
+        }
+        section {
+          page-break-inside: avoid;
+          margin-bottom: 20px;
+        }
+        .section-title {
+          font-size: 1.25rem;
+          margin-bottom: 10px;
+          border-bottom: 1px solid #e2e8f0;
+          padding-bottom: 10px;
+        }
+        label {
+          font-weight: 600;
+          font-size: 0.875rem;
+          margin-bottom: 4px;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="date"], textarea, select {
+          border: 1px solid #d1d5db; /* Gray-300 */
+          padding: 8px;
+          min-height: 2.5rem; /* Ensure input fields have height */
+          font-size: 0.875rem;
+          background-color: #f9fafb; /* Light background for fields */
+        }
+        textarea {
+          min-height: 80px;
+        }
+        .checkbox-group, .radio-group {
+          padding-top: 5px;
+          padding-bottom: 5px;
+        }
+      }
+    </style>
+</head>
+<body class="bg-primary-bg text-primary-text antialiased font-sans">
+    <div id="root" class="min-h-screen bg-primary-bg p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+      <div class="max-w-4xl mx-auto w-full bg-white shadow-lg rounded-xl p-6 sm:p-8 lg:p-10 border border-gray-200 form-container">
+        <header class="text-center mb-10">
+          <h1 class="text-4xl font-extrabold text-primary-text mb-3 leading-tight">
+            Bookkeeping Client Intake Form
+          </h1>
+          <p class="text-lg text-secondary-text max-w-2xl mx-auto">
+            <span class="font-semibold text-accent-600">Xanikton Creations LLC</span>
+            <br />
+            To help us get to know your business better and set up your bookkeeping services efficiently, we collect important details about your company, financial setup, and specific needs.
+          </p>
+          <p class="mt-4 text-sm text-gray-500 italic">
+            Please complete this form during our onboarding process. The information helps us customize your services and communicate effectively.
+          </p>
+        </header>
+
+        <!-- Autosave and Submission Status -->
+        <div id="autosaveStatus" role="status" aria-live="polite" class="sr-only"></div>
+        <p id="autosaveVisual" class="text-xs text-gray-500 mt-2 text-center mb-6">Your progress is saved automatically. Last saved: <span id="lastSavedTimestamp">Never</span></p>
+
+        <div id="submissionSuccessMessage" role="alert" aria-live="assertive" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6">
+            <strong class="font-bold">Success!</strong>
+            <span class="block sm:inline">Your form has been downloaded. Please *manually attach* the "Xanikton_Creations_Intake_Form.pdf" file to the email draft that will now open.</span>
+            <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" id="dismissSuccessMessage">
+                <svg class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+            </span>
+        </div>
+
+        <form id="intakeForm" class="space-y-10" novalidate>
+          <!-- Section A: Business Information -->
+          <section>
+            <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+              <h2 class="text-2xl font-extrabold text-primary-text mb-2">A. Business Information</h2>
+            </div>
+            
+            <div class="mb-6">
+              <label for="legalBusinessName" class="block text-sm font-medium text-secondary-text mb-1">
+                Legal Business Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="legalBusinessName"
+                name="legalBusinessName"
+                type="text"
+                placeholder="e.g., Xanikton Creations LLC"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+              <p id="legalBusinessName-error" class="error-message hidden" role="alert"></p>
+            </div>
+            
+            <div class="mb-6">
+              <label for="tradeName" class="block text-sm font-medium text-secondary-text mb-1">
+                Trade Name (DBA), if different
+              </label>
+              <input
+                id="tradeName"
+                name="tradeName"
+                type="text"
+                placeholder="e.g., Xanikton Bookkeeping"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+              />
+              <p id="tradeName-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6 radio-group" role="radiogroup" aria-labelledby="legalStructure-label">
+              <label id="legalStructure-label" class="block text-sm font-medium text-secondary-text mb-2">
+                Legal Structure <span class="text-red-500">*</span>
+              </label>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="legalStructure-Sole Proprietor" name="legalStructure" type="radio" value="Sole Proprietor" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="legalStructure-Sole Proprietor" class="ml-3 text-sm text-primary-text">Sole Proprietor</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="legalStructure-Single-Member LLC" name="legalStructure" type="radio" value="Single-Member LLC" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="legalStructure-Single-Member LLC" class="ml-3 text-sm text-primary-text">Single-Member LLC</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="legalStructure-Multi-Member LLC" name="legalStructure" type="radio" value="Multi-Member LLC" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="legalStructure-Multi-Member LLC" class="ml-3 text-sm text-primary-text">Multi-Member LLC</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="legalStructure-S-Corp" name="legalStructure" type="radio" value="S-Corp" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="legalStructure-S-Corp" class="ml-3 text-sm text-primary-text">S-Corp</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="legalStructure-C-Corp" name="legalStructure" type="radio" value="C-Corp" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="legalStructure-C-Corp" class="ml-3 text-sm text-primary-text">C-Corp</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="legalStructure-Partnership" name="legalStructure" type="radio" value="Partnership" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="legalStructure-Partnership" class="ml-3 text-sm text-primary-text">Partnership</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="legalStructure-Non-Profit" name="legalStructure" type="radio" value="Non-Profit" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="legalStructure-Non-Profit" class="ml-3 text-sm text-primary-text">Non-Profit</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="legalStructure-Other" name="legalStructure" type="radio" value="Other" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="legalStructure-Other" class="ml-3 text-sm text-primary-text">Other (Please specify)</label>
+                </div>
+                <div id="legalStructure-other-input-container" class="ml-8 mt-2" style="display: none;">
+                    <input
+                      id="legalStructureOther"
+                      name="legalStructureOther"
+                      type="text"
+                      placeholder="e.g., Trust, Cooperative"
+                      class="block w-full max-w-sm p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    />
+                    <p id="legalStructureOther-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </div>
+              <p id="legalStructure-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="ein" class="block text-sm font-medium text-secondary-text mb-1">
+                Federal Employer Identification Number (EIN), if applicable
+              </label>
+              <input
+                id="ein"
+                name="ein"
+                type="text"
+                placeholder="e.g., XX-XXXXXXX"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+              />
+              <p class="text-xs text-gray-500 mt-1">Format: XX-XXXXXXX</p>
+              <p id="ein-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="stateOfFormation" class="block text-sm font-medium text-secondary-text mb-1">
+                State of Formation/Registration <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="stateOfFormation"
+                name="stateOfFormation"
+                type="text"
+                placeholder="e.g., Delaware"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+              <p id="stateOfFormation-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="businessPhysicalAddress" class="block text-sm font-medium text-secondary-text mb-1">
+                Business Physical Address <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                id="businessPhysicalAddress"
+                name="businessPhysicalAddress"
+                rows="4"
+                placeholder="Street Address, City, State, Zip Code"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+                required
+              ></textarea>
+              <p id="businessPhysicalAddress-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="businessMailingAddress" class="block text-sm font-medium text-secondary-text mb-1">
+                Business Mailing Address (if different)
+              </label>
+              <textarea
+                id="businessMailingAddress"
+                name="businessMailingAddress"
+                rows="4"
+                placeholder="Street Address, City, State, Zip Code"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+              ></textarea>
+              <p id="businessMailingAddress-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="businessPhoneNumber" class="block text-sm font-medium text-secondary-text mb-1">
+                Business Phone Number <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="businessPhoneNumber"
+                name="businessPhoneNumber"
+                type="tel"
+                placeholder="e.g., (123) 456-7890"
+                pattern="^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$"
+                title="Please enter a valid phone number (e.g., (123) 456-7890)"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+              <p id="businessPhoneNumber-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="businessEmailAddress" class="block text-sm font-medium text-secondary-text mb-1">
+                Business Email Address <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="businessEmailAddress"
+                name="businessEmailAddress"
+                type="email"
+                placeholder="e.g., info@yourbusiness.com"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+              <p id="businessEmailAddress-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="businessWebsiteURL" class="block text-sm font-medium text-secondary-text mb-1">
+                Business Website URL
+              </label>
+              <input
+                id="businessWebsiteURL"
+                name="businessWebsiteURL"
+                type="url"
+                placeholder="e.g., https://www.example.com"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+              />
+              <p id="businessWebsiteURL-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="primaryIndustry" class="block text-sm font-medium text-secondary-text mb-1">
+                Primary Industry/Type of Business <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="primaryIndustry"
+                name="primaryIndustry"
+                type="text"
+                placeholder="e.g., Financial Services, Retail, Consulting"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+              <p id="primaryIndustry-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="productsServicesDescription" class="block text-sm font-medium text-secondary-text mb-1">
+                Brief Description of Products/Services Offered <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                id="productsServicesDescription"
+                name="productsServicesDescription"
+                rows="4"
+                placeholder="e.g., We offer full-cycle bookkeeping and payroll services for small businesses."
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+                required
+              ></textarea>
+              <p id="productsServicesDescription-error" class="error-message hidden" role="alert"></p>
+            </div>
+          </section>
+
+          <!-- Section B: Principal/Owner Information -->
+          <section>
+            <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+              <h2 class="text-2xl font-extrabold text-primary-text mb-2">B. Principal/Owner Information</h2>
+            </div>
+
+            <div class="mb-6">
+              <label for="principalFullName" class="block text-sm font-medium text-secondary-text mb-1">
+                Full Legal Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="principalFullName"
+                name="principalFullName"
+                type="text"
+                placeholder="First Name Last Name"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+              <p id="principalFullName-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="principalTitleRole" class="block text-sm font-medium text-secondary-text mb-1">
+                Title/Role <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="principalTitleRole"
+                name="principalTitleRole"
+                type="text"
+                placeholder="e.g., Owner, CEO, Founder"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+              <p id="principalTitleRole-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="principalEmailAddress" class="block text-sm font-medium text-secondary-text mb-1">
+                Email Address (Optional alternate contact)
+              </label>
+              <input
+                id="principalEmailAddress"
+                name="principalEmailAddress"
+                type="email"
+                placeholder="e.g., john.doe@example.com"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+              />
+              <p id="principalEmailAddress-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="principalPhoneNumber" class="block text-sm font-medium text-secondary-text mb-1">
+                Phone Number (Optional alternate contact)
+              </label>
+              <input
+                id="principalPhoneNumber"
+                name="principalPhoneNumber"
+                type="tel"
+                placeholder="e.g., (123) 456-7890"
+                pattern="^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$"
+                title="Please enter a valid phone number (e.g., (123) 456-7890)"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+              />
+              <p id="principalPhoneNumber-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6 checkbox-group" role="group" aria-labelledby="preferredCommunicationMethods-label">
+              <label id="preferredCommunicationMethods-label" class="block text-sm font-medium text-secondary-text mb-2">
+                Preferred Method of Communication <span class="text-red-500">*</span>
+              </label>
+              <p class="text-sm text-gray-500 italic mt-1 mb-2">Please select at least one option.</p>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="preferredCommunicationMethods-Email" name="preferredCommunicationMethods" type="checkbox" value="Email" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="preferredCommunicationMethods-Email" class="ml-3 text-sm text-primary-text">Email</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="preferredCommunicationMethods-Phone Call" name="preferredCommunicationMethods" type="checkbox" value="Phone Call" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="preferredCommunicationMethods-Phone Call" class="ml-3 text-sm text-primary-text">Phone Call</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="preferredCommunicationMethods-Text" name="preferredCommunicationMethods" type="checkbox" value="Text" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="preferredCommunicationMethods-Text" class="ml-3 text-sm text-primary-text">Text</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="preferredCommunicationMethods-Video Call" name="preferredCommunicationMethods" type="checkbox" value="Video Call" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="preferredCommunicationMethods-Video Call" class="ml-3 text-sm text-primary-text">Video Call</label>
+                </div>
+              </div>
+              <p id="preferredCommunicationMethods-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6 radio-group" role="radiogroup" aria-labelledby="preferredCommunicationFrequency-label">
+              <label id="preferredCommunicationFrequency-label" class="block text-sm font-medium text-secondary-text mb-2">
+                Preferred Communication Frequency <span class="text-red-500">*</span>
+              </label>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="preferredCommunicationFrequency-Weekly" name="preferredCommunicationFrequency" type="radio" value="Weekly" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="preferredCommunicationFrequency-Weekly" class="ml-3 text-sm text-primary-text">Weekly</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="preferredCommunicationFrequency-Bi-weekly" name="preferredCommunicationFrequency" type="radio" value="Bi-weekly" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="preferredCommunicationFrequency-Bi-weekly" class="ml-3 text-sm text-primary-text">Bi-weekly</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="preferredCommunicationFrequency-Monthly" name="preferredCommunicationFrequency" type="radio" value="Monthly" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="preferredCommunicationFrequency-Monthly" class="ml-3 text-sm text-primary-text">Monthly</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="preferredCommunicationFrequency-As needed" name="preferredCommunicationFrequency" type="radio" value="As needed" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="preferredCommunicationFrequency-As needed" class="ml-3 text-sm text-primary-text">As needed</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="preferredCommunicationFrequency-Other" name="preferredCommunicationFrequency" type="radio" value="Other" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="preferredCommunicationFrequency-Other" class="ml-3 text-sm text-primary-text">Other (Please specify)</label>
+                </div>
+                <div id="preferredCommunicationFrequency-other-input-container" class="ml-8 mt-2" style="display: none;">
+                    <input
+                      id="preferredCommunicationFrequencyOther"
+                      name="preferredCommunicationFrequencyOther"
+                      type="text"
+                      placeholder="e.g., Bi-annually, Quarterly"
+                      class="block w-full max-w-sm p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    />
+                    <p id="preferredCommunicationFrequencyOther-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </div>
+              <p id="preferredCommunicationFrequency-error" class="error-message hidden" role="alert"></p>
+            </div>
+          </section>
+
+          <!-- Section C: Existing Accounting Setup & Needs -->
+          <section>
+            <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+              <h2 class="text-2xl font-extrabold text-primary-text mb-2">C. Existing Accounting Setup & Needs</h2>
+            </div>
+
+            <div class="mb-6 checkbox-group" role="group" aria-labelledby="currentAccountingSoftware-label">
+              <label id="currentAccountingSoftware-label" class="block text-sm font-medium text-secondary-text mb-2">
+                Current Accounting Software (if any)
+              </label>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="currentAccountingSoftware-QuickBooks Desktop" name="currentAccountingSoftware" type="checkbox" value="QuickBooks Desktop" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="currentAccountingSoftware-QuickBooks Desktop" class="ml-3 text-sm text-primary-text">QuickBooks Desktop</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="currentAccountingSoftware-QuickBooks Online" name="currentAccountingSoftware" type="checkbox" value="QuickBooks Online" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="currentAccountingSoftware-QuickBooks Online" class="ml-3 text-sm text-primary-text">QuickBooks Online</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="currentAccountingSoftware-Xero" name="currentAccountingSoftware" type="checkbox" value="Xero" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="currentAccountingSoftware-Xero" class="ml-3 text-sm text-primary-text">Xero</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="currentAccountingSoftware-Wave" name="currentAccountingSoftware" type="checkbox" value="Wave" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="currentAccountingSoftware-Wave" class="ml-3 text-sm text-primary-text">Wave</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="currentAccountingSoftware-Spreadsheet" name="currentAccountingSoftware" type="checkbox" value="Spreadsheet" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="currentAccountingSoftware-Spreadsheet" class="ml-3 text-sm text-primary-text">Spreadsheet</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="currentAccountingSoftware-Manual" name="currentAccountingSoftware" type="checkbox" value="Manual" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="currentAccountingSoftware-Manual" class="ml-3 text-sm text-primary-text">Manual</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="currentAccountingSoftware-Other" name="currentAccountingSoftware" type="checkbox" value="Other" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="currentAccountingSoftware-Other" class="ml-3 text-sm text-primary-text">Other (Please specify)</label>
+                </div>
+                <div id="currentAccountingSoftware-other-input-container" class="ml-8 mt-2" style="display: none;">
+                    <input
+                      id="currentAccountingSoftwareOther"
+                      name="currentAccountingSoftwareOther"
+                      type="text"
+                      placeholder="Please specify your software"
+                      class="block w-full max-w-sm p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    />
+                    <p id="currentAccountingSoftwareOther-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </div>
+              <p id="currentAccountingSoftware-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div id="qboCompanyId-container" class="mb-6" style="display: none;">
+              <label for="qboCompanyId" class="block text-sm font-medium text-secondary-text mb-1">
+                If using QuickBooks Online, please provide your Company ID: (You can find this under the Gear icon ⚙️, then 'Account and settings', and finally 'Billing & Subscription') <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="qboCompanyId"
+                name="qboCompanyId"
+                type="text"
+                placeholder="e.g., 123456789"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+              />
+              <p id="qboCompanyId-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6 radio-group" role="radiogroup" aria-labelledby="fiscalYearEnd-label">
+              <label id="fiscalYearEnd-label" class="block text-sm font-medium text-secondary-text mb-2">
+                What is your fiscal year end? <span class="text-red-500">*</span>
+              </label>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="fiscalYearEnd-December 31" name="fiscalYearEnd" type="radio" value="December 31" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="fiscalYearEnd-December 31" class="ml-3 text-sm text-primary-text">December 31</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="fiscalYearEnd-June 30" name="fiscalYearEnd" type="radio" value="June 30" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="fiscalYearEnd-June 30" class="ml-3 text-sm text-primary-text">June 30</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="fiscalYearEnd-Other" name="fiscalYearEnd" type="radio" value="Other" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="fiscalYearEnd-Other" class="ml-3 text-sm text-primary-text">Other (Please specify)</label>
+                </div>
+                <div id="fiscalYearEnd-other-input-container" class="ml-8 mt-2" style="display: none;">
+                    <input
+                      id="fiscalYearEndOther"
+                      name="fiscalYearEndOther"
+                      type="text"
+                      placeholder="e.g., September 30"
+                      class="block w-full max-w-sm p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    />
+                    <p id="fiscalYearEndOther-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </div>
+              <p id="fiscalYearEnd-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="booksClosedReconciledDate" class="block text-sm font-medium text-secondary-text mb-1">
+                What is the last date your financial records were fully updated and balanced?
+              </label>
+              <input
+                id="booksClosedReconciledDate"
+                name="booksClosedReconciledDate"
+                type="date"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+              />
+              <p id="booksClosedReconciledDate-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="priorTaxReturnsFiled" class="block text-sm font-medium text-secondary-text mb-1">
+                Are your prior year's tax returns filed? If so, for which years?
+              </label>
+              <textarea
+                id="priorTaxReturnsFiled"
+                name="priorTaxReturnsFiled"
+                rows="4"
+                placeholder="e.g., Yes, 2022, 2023"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+              ></textarea>
+              <p id="priorTaxReturnsFiled-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6 checkbox-group" role="group" aria-labelledby="reasonsForSeekingServices-label">
+              <label id="reasonsForSeekingServices-label" class="block text-sm font-medium text-secondary-text mb-2">
+                What are your primary reasons for seeking bookkeeping services? <span class="text-red-500">*</span>
+              </label>
+              <p class="text-sm text-gray-500 italic mt-1 mb-2">Please select at least one option.</p>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="reasonsForSeekingServices-Falling behind" name="reasonsForSeekingServices" type="checkbox" value="Falling behind" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="reasonsForSeekingServices-Falling behind" class="ml-3 text-sm text-primary-text">Falling behind</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="reasonsForSeekingServices-Need better financial insights" name="reasonsForSeekingServices" type="checkbox" value="Need better financial insights" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="reasonsForSeekingServices-Need better financial insights" class="ml-3 text-sm text-primary-text">Need better financial insights</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="reasonsForSeekingServices-Tax preparation" name="reasonsForSeekingServices" type="checkbox" value="Tax preparation" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="reasonsForSeekingServices-Tax preparation" class="ml-3 text-sm text-primary-text">Tax preparation</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="reasonsForSeekingServices-Saving time" name="reasonsForSeekingServices" type="checkbox" value="Saving time" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="reasonsForSeekingServices-Saving time" class="ml-3 text-sm text-primary-text">Saving time</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="reasonsForSeekingServices-Don't like doing it" name="reasonsForSeekingServices" type="checkbox" value="Don't like doing it" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="reasonsForSeekingServices-Don't like doing it" class="ml-3 text-sm text-primary-text">Don't like doing it</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="reasonsForSeekingServices-Streamline operations" name="reasonsForSeekingServices" type="checkbox" value="Streamline operations" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="reasonsForSeekingServices-Streamline operations" class="ml-3 text-sm text-primary-text">Streamline operations</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="reasonsForSeekingServices-Growth support" name="reasonsForSeekingServices" type="checkbox" value="Growth support" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="reasonsForSeekingServices-Growth support" class="ml-3 text-sm text-primary-text">Growth support</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="reasonsForSeekingServices-Other" name="reasonsForSeekingServices" type="checkbox" value="Other" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="reasonsForSeekingServices-Other" class="ml-3 text-sm text-primary-text">Other (Please specify)</label>
+                </div>
+                <div id="reasonsForSeekingServices-other-input-container" class="ml-8 mt-2" style="display: none;">
+                    <input
+                      id="reasonsForSeekingServicesOther"
+                      name="reasonsForSeekingServicesOther"
+                      type="text"
+                      placeholder="Please specify other reasons"
+                      class="block w-full max-w-sm p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    />
+                    <p id="reasonsForSeekingServicesOther-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </div>
+              <p id="reasonsForSeekingServices-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="biggestFinancialChallenges" class="block text-sm font-medium text-secondary-text mb-1">
+                What are your biggest financial challenges or pain points right now?
+              </label>
+              <textarea
+                id="biggestFinancialChallenges"
+                name="biggestFinancialChallenges"
+                rows="4"
+                placeholder="e.g., Cash flow management, reconciling accounts, understanding reports"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+              ></textarea>
+              <p id="biggestFinancialChallenges-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6 checkbox-group" role="group" aria-labelledby="specificFinancialReports-label">
+              <label id="specificFinancialReports-label" class="block text-sm font-medium text-secondary-text mb-2">
+                What specific financial reports would you like to receive?
+              </label>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="specificFinancialReports-Profit & Loss" name="specificFinancialReports" type="checkbox" value="Profit & Loss" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="specificFinancialReports-Profit & Loss" class="ml-3 text-sm text-primary-text">Profit & Loss</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="specificFinancialReports-Balance Sheet" name="specificFinancialReports" type="checkbox" value="Balance Sheet" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="specificFinancialReports-Balance Sheet" class="ml-3 text-sm text-primary-text">Balance Sheet</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="specificFinancialReports-Cash Flow" name="specificFinancialReports" type="checkbox" value="Cash Flow" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="specificFinancialReports-Cash Flow" class="ml-3 text-sm text-primary-text">Cash Flow</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="specificFinancialReports-Accounts Receivable Aging" name="specificFinancialReports" type="checkbox" value="Accounts Receivable Aging" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="specificFinancialReports-Accounts Receivable Aging" class="ml-3 text-sm text-primary-text">Accounts Receivable Aging</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="specificFinancialReports-Accounts Payable Aging" name="specificFinancialReports" type="checkbox" value="Accounts Payable Aging" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="specificFinancialReports-Accounts Payable Aging" class="ml-3 text-sm text-primary-text">Accounts Payable Aging</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="specificFinancialReports-Other" name="specificFinancialReports" type="checkbox" value="Other" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="specificFinancialReports-Other" class="ml-3 text-sm text-primary-text">Other (Please specify)</label>
+                </div>
+                <div id="specificFinancialReports-other-input-container" class="ml-8 mt-2" style="display: none;">
+                    <input
+                      id="specificFinancialReportsOther"
+                      name="specificFinancialReportsOther"
+                      type="text"
+                      placeholder="Please specify other reports"
+                      class="block w-full max-w-sm p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    />
+                    <p id="specificFinancialReportsOther-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </div>
+              <p id="specificFinancialReports-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="collectingSalesTax" class="block text-sm font-medium text-secondary-text mb-1">
+                Are you currently collecting sales tax? If so, in which states/localities?
+              </label>
+              <textarea
+                id="collectingSalesTax"
+                name="collectingSalesTax"
+                rows="4"
+                placeholder="e.g., Yes, in California and New York"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+              ></textarea>
+              <p id="collectingSalesTax-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6 radio-group" role="radiogroup" aria-labelledby="hasEmployeesContractors-label">
+              <label id="hasEmployeesContractors-label" class="block text-sm font-medium text-secondary-text mb-2">
+                Do you currently have employees or contractors that you pay? <span class="text-red-500">*</span>
+              </label>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="hasEmployeesContractors-Yes" name="hasEmployeesContractors" type="radio" value="Yes" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="hasEmployeesContractors-Yes" class="ml-3 text-sm text-primary-text">Yes</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="hasEmployeesContractors-No" name="hasEmployeesContractors" type="radio" value="No" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="hasEmployeesContractors-No" class="ml-3 text-sm text-primary-text">No</label>
+                </div>
+              </div>
+              <p id="hasEmployeesContractors-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div id="payrollProvider-container" class="mb-6" style="display: none;">
+              <label for="payrollProvider" class="block text-sm font-medium text-secondary-text mb-1">
+                If yes, which payroll provider do you use? <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="payrollProvider"
+                name="payrollProvider"
+                type="text"
+                placeholder="e.g., QuickBooks Payroll, Gusto, ADP"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+              />
+              <p id="payrollProvider-error" class="error-message hidden" role="alert"></p>
+            </div>
+          </section>
+
+          <!-- Section D: Financial Accounts & Payment Processors -->
+          <section>
+            <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+              <h2 class="text-2xl font-extrabold text-primary-text mb-2">D. Financial Accounts & QBO Connectivity</h2>
+              <p class="text-md text-secondary-text">Please provide information regarding the financial accounts you'd like us to reconcile.</p>
+            </div>
+
+            <div class="mb-6">
+              <label for="numAccountsToReconcile" class="block text-sm font-medium text-secondary-text mb-1">
+                How many accounts do you want reconciled? <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="numAccountsToReconcile"
+                name="numAccountsToReconcile"
+                type="number"
+                min="0"
+                placeholder="e.g., 3"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+              <p id="numAccountsToReconcile-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <!-- New Checkbox Group for Account Types -->
+            <div class="mb-6 checkbox-group" role="group" aria-labelledby="accountTypesToReconcile-label">
+              <label id="accountTypesToReconcile-label" class="block text-sm font-medium text-secondary-text mb-2">
+                What types of accounts do you want reconciled? <span class="text-red-500">*</span>
+              </label>
+              <p class="text-sm text-gray-500 italic mt-1 mb-2">Please select at least one option.</p>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="accountTypesToReconcile-Bank Account" name="accountTypesToReconcile" type="checkbox" value="Bank Account" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="accountTypesToReconcile-Bank Account" class="ml-3 text-sm text-primary-text">Bank Account</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="accountTypesToReconcile-Credit Card" name="accountTypesToReconcile" type="checkbox" value="Credit Card" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="accountTypesToReconcile-Credit Card" class="ml-3 text-sm text-primary-text">Credit Card</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="accountTypesToReconcile-Other" name="accountTypesToReconcile" type="checkbox" value="Other" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded" />
+                  <label for="accountTypesToReconcile-Other" class="ml-3 text-sm text-primary-text">Other (Please specify)</label>
+                </div>
+                <div id="accountTypesToReconcile-other-input-container" class="ml-8 mt-2" style="display: none;">
+                  <textarea
+                    id="accountTypesToReconcileOther"
+                    name="accountTypesToReconcileOther"
+                    rows="2"
+                    placeholder="e.g., Investment Accounts, Loan Accounts"
+                    class="block w-full max-w-sm p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+                  ></textarea>
+                  <p id="accountTypesToReconcileOther-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </div>
+              <p id="accountTypesToReconcile-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6 radio-group" role="radiogroup" aria-labelledby="qboConnectionAllowed-label">
+              <label id="qboConnectionAllowed-label" class="block text-sm font-medium text-secondary-text mb-2">
+                Do the institutions for these accounts allow for direct connection to QuickBooks Online (QBO) to download statements and transactions? <span class="text-red-500">*</span>
+              </label>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input id="qboConnectionAllowed-Yes" name="qboConnectionAllowed" type="radio" value="Yes" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="qboConnectionAllowed-Yes" class="ml-3 text-sm text-primary-text">Yes</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="qboConnectionAllowed-No" name="qboConnectionAllowed" type="radio" value="No" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="qboConnectionAllowed-No" class="ml-3 text-sm text-primary-text">No</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="qboConnectionAllowed-Partial" name="qboConnectionAllowed" type="radio" value="Partial" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="qboConnectionAllowed-Partial" class="ml-3 text-sm text-primary-text">Partial</label>
+                </div>
+                <div class="flex items-center">
+                  <input id="qboConnectionAllowed-Unsure" name="qboConnectionAllowed" type="radio" value="Unsure" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" required />
+                  <label for="qboConnectionAllowed-Unsure" class="ml-3 text-sm text-primary-text">Unsure</label>
+                </div>
+              </div>
+              <p id="qboConnectionAllowed-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <!-- Conditional Textbox for QBO Connectivity Details -->
+            <div id="qboConnectivityDetails-container" class="mb-6" style="display: none;">
+              <label for="qboConnectivityDetails" class="block text-sm font-medium text-secondary-text mb-1">
+                If "No" or "Partial", please specify which account types do not allow direct connectivity and why: <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                id="qboConnectivityDetails"
+                name="qboConnectivityDetails"
+                rows="4"
+                placeholder="e.g., 'My business savings account (ABC Bank) does not support direct QBO connection. Credit cards work fine.'"
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+              ></textarea>
+              <p id="qboConnectivityDetails-error" class="error-message hidden" role="alert"></p>
+            </div>
+          </section>
+
+          <!-- Section E: Other Relevant Information -->
+          <section>
+            <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+              <h2 class="text-2xl font-extrabold text-primary-text mb-2">E. Other Relevant Information</h2>
+            </div>
+
+            <div class="mb-6">
+              <label for="inventoryTracking" class="block text-sm font-medium text-secondary-text mb-1">
+                Do you maintain inventory? If so, how is it currently tracked/valued? (e.g., physically, spreadsheet, QBO, other system)
+              </label>
+              <textarea
+                id="inventoryTracking"
+                name="inventoryTracking"
+                rows="4"
+                placeholder="e.g., Yes, tracked in QBO with FIFO valuation."
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+              ></textarea>
+              <p id="inventoryTracking-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="expenseCategorizationPreferences" class="block text-sm font-medium text-secondary-text mb-1">
+                Do you have any specific requirements or preferences regarding how your expenses are categorized?
+              </label>
+              <textarea
+                id="expenseCategorizationPreferences"
+                name="expenseCategorizationPreferences"
+                rows="4"
+                placeholder="e.g., Separate categories for marketing expenses vs. advertising."
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+              ></textarea>
+              <p id="expenseCategorizationPreferences-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="upcomingBusinessChanges" class="block text-sm font-medium text-secondary-text mb-1">
+                Are there any upcoming changes in your business that might affect your bookkeeping? (e.g., new products, new services, significant growth, hiring)
+              </label>
+              <textarea
+                id="upcomingBusinessChanges"
+                name="upcomingBusinessChanges"
+                rows="4"
+                placeholder="e.g., Planning to launch a new product line next quarter, expect significant hiring."
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+              ></textarea>
+              <p id="upcomingBusinessChanges-error" class="error-message hidden" role="alert"></p>
+            </div>
+
+            <div class="mb-6">
+              <label for="anythingElse" class="block text-sm font-medium text-secondary-text mb-1">
+                Is there anything else you would like us to know about your business or your financial needs?
+              </label>
+              <textarea
+                id="anythingElse"
+                name="anythingElse"
+                rows="4"
+                placeholder="Any additional information you deem relevant."
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+              ></textarea>
+              <p id="anythingElse-error" class="error-message hidden" role="alert"></p>
+            </div>
+          </section>
+
+          <div class="flex justify-end mt-10 space-x-4 form-actions">
+            <button
+              type="button"
+              id="clearFormButton"
+              class="px-8 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200 ease-in-out"
+            >
+              Clear Form
+            </button>
+            <button
+              type="button"
+              id="printFormButton"
+              class="px-8 py-3 bg-secondary-bg text-secondary-text font-semibold rounded-lg shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition duration-200 ease-in-out"
+            >
+              Print for My Records
+            </button>
+            <button
+              type="submit"
+              id="submitFormButton"
+              class="px-8 py-3 bg-accent-600 text-white font-semibold rounded-lg shadow-md hover:bg-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 transition duration-200 ease-in-out"
+            >
+              Submit Form
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- html2pdf.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsIDtaTqilKTwQasNJRpeT1tkt0RtLDKefMnsHSQrXKNCgPZXTcwsHk5LhXgKqLg2Nzm0jCgLzC4/E0EiyWdRw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      const LOCAL_STORAGE_KEY = 'xanikton_intake_form_data_vanilla';
+      const form = document.getElementById('intakeForm');
+      const submitFormButton = document.getElementById('submitFormButton');
+      const printFormButton = document.getElementById('printFormButton');
+      const clearFormButton = document.getElementById('clearFormButton');
+      const autosaveStatus = document.getElementById('autosaveStatus'); // SR-only autosave
+      const autosaveVisual = document.getElementById('autosaveVisual'); // Visible autosave
+      const lastSavedTimestamp = document.getElementById('lastSavedTimestamp'); // Timestamp span
+      const submissionSuccessMessage = document.getElementById('submissionSuccessMessage');
+      const dismissSuccessMessageButton = document.getElementById('dismissSuccessMessage');
+
+      let inputElements = Array.from(form.querySelectorAll('input, textarea')); // Dynamically update this list
+
+      // Function to show/hide error messages
+      function displayError(id, message) {
+          const errorElement = document.getElementById(`${id}-error`);
+          const inputElement = document.getElementById(id); // This could be null for group IDs (e.g., 'legalStructure')
+
+          if (errorElement) {
+              errorElement.textContent = message;
+              errorElement.classList.remove('hidden');
+          }
+
+          // Only set aria attributes and add input-error class if inputElement exists
+          if (inputElement) {
+              inputElement.setAttribute('aria-describedby', `${id}-error`);
+              inputElement.setAttribute('aria-invalid', 'true');
+              inputElement.classList.add('input-error');
+          }
+      }
+
+      // Function to clear error messages
+      function clearError(id) {
+          const errorElement = document.getElementById(`${id}-error`);
+          const inputElement = document.getElementById(id); // This could be null for group IDs (e.g., 'legalStructure')
+
+          if (errorElement) {
+              errorElement.textContent = '';
+              errorElement.classList.add('hidden');
+          }
+
+          // Only try to remove aria attributes and class if inputElement exists
+          if (inputElement) {
+              inputElement.removeAttribute('aria-describedby');
+              inputElement.removeAttribute('aria-invalid');
+              inputElement.classList.remove('input-error');
+          }
+      }
+
+      // Function to clear all error messages and styling from the form
+      function clearAllErrors() {
+          form.querySelectorAll('.error-message').forEach(el => {
+              el.textContent = '';
+              el.classList.add('hidden');
+          });
+          form.querySelectorAll('.input-error').forEach(el => {
+              el.classList.remove('input-error');
+              el.removeAttribute('aria-invalid');
+              el.removeAttribute('aria-describedby');
+          });
+      }
+
+      // Helper for conditional visibility
+      function setDisplay(elementId, display) {
+          const element = document.getElementById(elementId);
+          if (element) {
+              element.style.display = display ? 'block' : 'none';
+              // Also manage 'required' attribute for conditional inputs
+              const input = element.querySelector('input, textarea, select'); // Added select for future proofing
+              if (input) {
+                  input.required = display;
+              }
+          }
+      }
+
+      // Update conditional fields based on current form state
+      function updateConditionalFields() {
+          // Legal Structure 'Other'
+          const legalStructureOtherInput = document.getElementById('legalStructureOther');
+          if (legalStructureOtherInput) {
+            const selectedLegalStructure = form.querySelector('input[name="legalStructure"]:checked')?.value;
+            setDisplay('legalStructure-other-input-container', selectedLegalStructure === 'Other');
+          }
+
+          // Preferred Communication Frequency 'Other'
+          const preferredCommFreqOtherInput = document.getElementById('preferredCommunicationFrequencyOther');
+          if (preferredCommFreqOtherInput) {
+            const selectedCommFreq = form.querySelector('input[name="preferredCommunicationFrequency"]:checked')?.value;
+            setDisplay('preferredCommunicationFrequency-other-input-container', selectedCommFreq === 'Other');
+          }
+
+          // Current Accounting Software 'Other'
+          const accountingSoftwareOtherInput = document.getElementById('currentAccountingSoftwareOther');
+          const otherSoftwareCheckbox = document.getElementById('currentAccountingSoftware-Other');
+          setDisplay('currentAccountingSoftware-other-input-container', otherSoftwareCheckbox && otherSoftwareCheckbox.checked);
+          if (accountingSoftwareOtherInput) accountingSoftwareOtherInput.required = (otherSoftwareCheckbox && otherSoftwareCheckbox.checked);
+
+
+          // QBO Company ID
+          const qboCheckbox = document.getElementById('currentAccountingSoftware-QuickBooks Online');
+          const qboCompanyIdInput = document.getElementById('qboCompanyId');
+          setDisplay('qboCompanyId-container', qboCheckbox && qboCheckbox.checked);
+          if (qboCompanyIdInput) qboCompanyIdInput.required = (qboCheckbox && qboCheckbox.checked);
+
+
+          // Fiscal Year End 'Other'
+          const fiscalYearEndOtherInput = document.getElementById('fiscalYearEndOther');
+          if (fiscalYearEndOtherInput) {
+            const selectedFiscalYearEnd = form.querySelector('input[name="fiscalYearEnd"]:checked')?.value;
+            setDisplay('fiscalYearEnd-other-input-container', selectedFiscalYearEnd === 'Other');
+          }
+
+          // Reasons for Seeking Services 'Other'
+          const reasonsOtherCheckbox = document.getElementById('reasonsForSeekingServices-Other');
+          const reasonsForSeekingServicesOtherInput = document.getElementById('reasonsForSeekingServicesOther');
+          setDisplay('reasonsForSeekingServices-other-input-container', reasonsOtherCheckbox && reasonsOtherCheckbox.checked);
+          if (reasonsForSeekingServicesOtherInput) reasonsForSeekingServicesOtherInput.required = (reasonsOtherCheckbox && reasonsOtherCheckbox.checked);
+
+          // Specific Financial Reports 'Other'
+          const reportsOtherCheckbox = document.getElementById('specificFinancialReports-Other');
+          const specificFinancialReportsOtherInput = document.getElementById('specificFinancialReportsOther');
+          setDisplay('specificFinancialReports-other-input-container', reportsOtherCheckbox && reportsOtherCheckbox.checked);
+          if (specificFinancialReportsOtherInput) specificFinancialReportsOtherInput.required = (reportsOtherCheckbox && reportsOtherCheckbox.checked);
+
+
+          // Payroll Provider
+          const hasEmployeesYesRadio = document.getElementById('hasEmployeesContractors-Yes');
+          const payrollProviderInput = document.getElementById('payrollProvider');
+          setDisplay('payrollProvider-container', hasEmployeesYesRadio && hasEmployeesYesRadio.checked);
+          if (payrollProviderInput) payrollProviderInput.required = (hasEmployeesYesRadio && hasEmployeesYesRadio.checked);
+          
+          // D. Financial Accounts & QBO Connectivity additions:
+
+          // Account Types To Reconcile 'Other'
+          const accountTypesOtherCheckbox = document.getElementById('accountTypesToReconcile-Other');
+          const accountTypesToReconcileOtherTextarea = document.getElementById('accountTypesToReconcileOther');
+          setDisplay('accountTypesToReconcile-other-input-container', accountTypesOtherCheckbox && accountTypesOtherCheckbox.checked);
+          if (accountTypesToReconcileOtherTextarea) accountTypesToReconcileOtherTextarea.required = (accountTypesOtherCheckbox && accountTypesOtherCheckbox.checked);
+
+          // QBO Connectivity Details for 'No' or 'Partial'
+          const qboConnectionNoRadio = document.getElementById('qboConnectionAllowed-No');
+          const qboConnectionPartialRadio = document.getElementById('qboConnectionAllowed-Partial');
+          const qboConnectivityDetailsTextarea = document.getElementById('qboConnectivityDetails');
+          const showQboConnectivityDetails = (qboConnectionNoRadio && qboConnectionNoRadio.checked) || (qboConnectionPartialRadio && qboConnectionPartialRadio.checked);
+          setDisplay('qboConnectivityDetails-container', showQboConnectivityDetails);
+          if (qboConnectivityDetailsTextarea) qboConnectivityDetailsTextarea.required = showQboConnectivityDetails;
+      }
+
+      // Save form data to localStorage
+      function saveFormData() {
+          const data = {};
+          // Re-query inputElements to ensure new/removed fields are considered
+          inputElements = Array.from(form.querySelectorAll('input, textarea'));
+          inputElements.forEach(input => {
+              // Only save if the input is not part of a hidden container
+              if (input.closest('div[style*="display: none"]') !== null) {
+                  return; // Skip hidden elements
+              }
+              if (input.type === 'radio') {
+                  if (input.checked) {
+                      data[input.name] = input.value;
+                  }
+              } else if (input.type === 'checkbox') {
+                  // Ensure array exists for the checkbox group
+                  if (!data[input.name]) data[input.name] = [];
+                  if (input.checked) {
+                      if (!data[input.name].includes(input.value)) {
+                         data[input.name].push(input.value);
+                      }
+                  } else {
+                      // Remove if unchecked, ensuring value exists before trying to remove
+                      data[input.name] = data[input.name].filter(val => val !== input.value);
+                  }
+              } else {
+                  data[input.name] = input.value;
+              }
+          });
+          const timestamp = new Date().toLocaleString();
+          data.lastSaved = timestamp;
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+
+          // Update autosave visual and SR-only status
+          if (autosaveVisual) {
+              autosaveVisual.classList.remove('hidden');
+              lastSavedTimestamp.textContent = timestamp;
+          }
+          if (autosaveStatus) {
+            autosaveStatus.textContent = `Form progress saved automatically at ${timestamp}.`;
+          }
+      }
+
+      // Load form data from localStorage
+      function loadFormData() {
+          const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+          if (savedData) {
+              const data = JSON.parse(savedData);
+              // Re-query inputElements to ensure new/removed fields are considered
+              inputElements = Array.from(form.querySelectorAll('input, textarea'));
+              inputElements.forEach(input => {
+                  if (input.type === 'radio') {
+                      if (data[input.name] === input.value) {
+                          input.checked = true;
+                      }
+                  } else if (input.type === 'checkbox') {
+                      if (Array.isArray(data[input.name]) && data[input.name].includes(input.value)) {
+                          input.checked = true;
+                      }
+                  } else {
+                      input.value = data[input.name] || '';
+                  }
+              });
+
+              // Load and display last saved timestamp
+              if (data.lastSaved && autosaveVisual) {
+                  autosaveVisual.classList.remove('hidden');
+                  lastSavedTimestamp.textContent = data.lastSaved;
+              }
+          }
+          updateConditionalFields(); // Update visibility after loading data
+      }
+
+      // Validate the form
+      function validateForm() {
+          let isValid = true;
+
+          // Clear all previous errors before re-validating
+          clearAllErrors();
+
+          // Re-query inputElements to ensure new/removed fields are considered for validation
+          inputElements = Array.from(form.querySelectorAll('input, textarea'));
+
+          // Check required text/textarea/number inputs
+          inputElements.forEach(input => {
+              // Check only if required and currently visible and does not have type 'radio' or 'checkbox'
+              // Principal Email Address and Phone Number are now explicitly NOT required.
+              if (input.required && input.closest('div[style*="display: none"]') === null && input.type !== 'radio' && input.type !== 'checkbox' && input.id !== 'principalEmailAddress' && input.id !== 'principalPhoneNumber') {
+                  if (!input.value.trim()) {
+                      const labelText = input.previousElementSibling ? input.previousElementSibling.textContent.replace(' *', '').trim() : input.placeholder || input.id;
+                      displayError(input.id, `${labelText} is required.`);
+                      isValid = false;
+                  } else if (input.type === 'number' && isNaN(parseInt(input.value))) {
+                      displayError(input.id, 'Please enter a valid number.');
+                      isValid = false;
+                  }
+              }
+          });
+          
+
+          // Check required radio groups
+          form.querySelectorAll('.radio-group[aria-labelledby]').forEach(group => {
+              const groupLabelId = group.querySelector('label').id;
+              const groupId = groupLabelId.replace('-label', '');
+              
+              if (group.closest('div[style*="display: none"]') !== null) { // Skip if the whole group is hidden
+                return;
+              }
+
+              const radios = group.querySelectorAll(`input[name="${groupId}"]:checked`);
+              if (radios.length === 0) {
+                  displayError(groupId, `${group.querySelector('label').textContent.replace(' *', '').trim()} is required.`);
+                  isValid = false;
+              } else {
+                  // Check 'Other' for radio groups
+                  const selectedValue = radios[0].value;
+                  const otherInput = document.getElementById(`${groupId}Other`);
+                  if (selectedValue === 'Other' && otherInput && otherInput.style.display !== 'none' && !otherInput.value.trim()) {
+                      displayError(otherInput.id, 'Please specify your selection.');
+                      isValid = false;
+                  }
+              }
+          });
+          
+          // Check required checkbox groups (e.g., preferredCommunicationMethods, reasonsForSeekingServices, accountTypesToReconcile)
+          form.querySelectorAll('.checkbox-group[aria-labelledby]').forEach(group => {
+              const groupLabelId = group.querySelector('label').id;
+              const groupId = groupLabelId.replace('-label', '');
+              
+              if (group.closest('div[style*="display: none"]') !== null) { // Skip if the whole group is hidden
+                return;
+              }
+
+              // Apply required validation if it's one of the specific required checkbox groups
+              const isRequiredCheckboxGroup = ['preferredCommunicationMethods', 'reasonsForSeekingServices', 'accountTypesToReconcile'].includes(groupId);
+
+              if (isRequiredCheckboxGroup) {
+                  const checkboxes = group.querySelectorAll(`input[name="${groupId}"]:checked`);
+                  if (checkboxes.length === 0) {
+                      displayError(groupId, `Please select at least one option.`);
+                      isValid = false;
+                  }
+              }
+
+              // Check 'Other' for checkbox groups
+              const otherCheckbox = document.getElementById(`${groupId}-Other`);
+              const otherInput = document.getElementById(`${groupId}Other`); // This could be input or textarea
+              if (otherCheckbox && otherCheckbox.checked && otherInput && otherInput.style.display !== 'none' && !otherInput.value.trim()) {
+                  displayError(otherInput.id, 'Please specify your selection.');
+                  isValid = false;
+              }
+          });
+
+
+          // Specific Validations (Email, URL, Phone numbers using browser's native pattern validation where available)
+          const emailFields = ['businessEmailAddress', 'principalEmailAddress'];
+          emailFields.forEach(id => {
+              const input = document.getElementById(id);
+              // Only validate if input has a value AND is visible (optional fields shouldn't fail if empty)
+              if (input && input.value && input.closest('div[style*="display: none"]') === null && !/\S+@\S+\.\S+/.test(input.value)) {
+                  displayError(id, 'Please enter a valid email address.');
+                  isValid = false;
+              }
+          });
+
+          const businessWebsiteURL = document.getElementById('businessWebsiteURL');
+          if (businessWebsiteURL && businessWebsiteURL.value && businessWebsiteURL.closest('div[style*="display: none"]') === null && !/^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/[a-zA-Z0-9]+\.[^\s]{2,}|[a-zA-Z0-9]+\.[^\s]{2,})$/i.test(businessWebsiteURL.value)) {
+              displayError('businessWebsiteURL', 'Please enter a valid URL.');
+              isValid = false;
+          }
+
+          const phoneFields = ['businessPhoneNumber', 'principalPhoneNumber'];
+          phoneFields.forEach(id => {
+            const input = document.getElementById(id);
+            // Only validate if input has a value AND is visible
+            if (input && input.value && input.closest('div[style*="display: none"]') === null && !input.checkValidity()) {
+              displayError(id, input.title || 'Please enter a valid phone number.');
+              isValid = false;
+            }
+          });
+          
+          return isValid;
+      }
+
+      // Event Listener for input changes (for saving and conditional fields)
+      form.addEventListener('input', (event) => {
+          saveFormData();
+          updateConditionalFields();
+          // Clear error on input if it was previously set for single inputs
+          if (event.target.id) clearError(event.target.id);
+          // For radio and checkbox groups, clear the group's error as well
+          const name = event.target.name;
+          if (event.target.type === 'radio' || event.target.type === 'checkbox') {
+             clearError(name); // Clear error for the group name
+          }
+      });
+
+      // Define a mapping of input IDs to their display labels (including conditional 'other' inputs)
+      const fieldLabels = {
+        // Section A
+        legalBusinessName: 'Legal Business Name',
+        tradeName: 'Trade Name (DBA), if different',
+        legalStructure: 'Legal Structure',
+        legalStructureOther: 'Legal Structure (Other)',
+        ein: 'Federal Employer Identification Number (EIN)',
+        stateOfFormation: 'State of Formation/Registration',
+        businessPhysicalAddress: 'Business Physical Address',
+        businessMailingAddress: 'Business Mailing Address (if different)',
+        businessPhoneNumber: 'Business Phone Number',
+        businessEmailAddress: 'Business Email Address',
+        businessWebsiteURL: 'Business Website URL',
+        primaryIndustry: 'Primary Industry/Type of Business',
+        productsServicesDescription: 'Brief Description of Products/Services Offered',
+
+        // Section B
+        principalFullName: 'Full Legal Name',
+        principalTitleRole: 'Title/Role',
+        principalEmailAddress: 'Email Address (Optional alternate contact)',
+        principalPhoneNumber: 'Phone Number (Optional alternate contact)',
+        preferredCommunicationMethods: 'Preferred Method of Communication',
+        preferredCommunicationFrequency: 'Preferred Communication Frequency',
+        preferredCommunicationFrequencyOther: 'Preferred Communication Frequency (Other)',
+
+        // Section C
+        currentAccountingSoftware: 'Current Accounting Software (if any)',
+        currentAccountingSoftwareOther: 'Current Accounting Software (Other)',
+        qboCompanyId: 'QuickBooks Online Company ID',
+        fiscalYearEnd: 'Fiscal year end',
+        fiscalYearEndOther: 'Fiscal year end (Other)',
+        booksClosedReconciledDate: 'Last date your financial records were fully updated and balanced',
+        priorTaxReturnsFiled: 'Prior year\'s tax returns filed (for which years)',
+        reasonsForSeekingServices: 'Primary reasons for seeking bookkeeping services',
+        reasonsForSeekingServicesOther: 'Primary reasons for seeking bookkeeping services (Other)',
+        biggestFinancialChallenges: 'Biggest financial challenges or pain points',
+        specificFinancialReports: 'Specific financial reports to receive',
+        specificFinancialReportsOther: 'Specific financial Reports to receive (Other)',
+        collectingSalesTax: 'Collecting sales tax (states/localities)',
+        hasEmployeesContractors: 'Have employees or contractors',
+        payrollProvider: 'Payroll provider',
+
+        // Section D (UPDATED)
+        numAccountsToReconcile: 'Number of accounts for reconciliation',
+        accountTypesToReconcile: 'Types of accounts for reconciliation',
+        accountTypesToReconcileOther: 'Other account types for reconciliation',
+        qboConnectionAllowed: 'Allow direct connection to QuickBooks Online (QBO)',
+        qboConnectivityDetails: 'QBO Connectivity Details (No/Partial)',
+
+        // Section E
+        inventoryTracking: 'Inventory tracking/valuation',
+        expenseCategorizationPreferences: 'Expense categorization preferences',
+        upcomingBusinessChanges: 'Upcoming business changes affecting bookkeeping',
+        anythingElse: 'Anything else to know'
+      };
+
+      // Helper to get formatted value for PDF/Email
+      const getFormattedValue = (fieldId, forPdf = false) => {
+          const inputElement = document.getElementById(fieldId);
+          if (!inputElement || inputElement.closest('div[style*="display: none"]') !== null) return null; // Skip if element or its container is hidden
+
+          if (inputElement.type === 'checkbox') {
+              const checkedValues = Array.from(form.querySelectorAll(`input[name="${fieldId}"]:checked`)).map(cb => cb.value);
+              const otherInput = document.getElementById(`${fieldId}Other`); // Could be textarea for this specific field
+              if (otherInput && otherInput.value.trim() && otherInput.style.display !== 'none' && checkedValues.includes('Other')) {
+                  // Replace 'Other' with 'Other: [value]' if an "Other" input is visible and has a value
+                  const otherIndex = checkedValues.indexOf('Other');
+                  if (otherIndex > -1) {
+                      checkedValues[otherIndex] = `Other: ${otherInput.value.trim()}`;
+                  } else {
+                      checkedValues.push(`Other: ${otherInput.value.trim()}`); // In case 'Other' was not explicitly checked but the text field was filled
+                  }
+              }
+              return checkedValues.length > 0 ? checkedValues.join(', ') : (forPdf ? 'N/A' : '');
+          } else if (inputElement.type === 'radio') {
+              const selectedRadio = form.querySelector(`input[name="${fieldId}"]:checked`);
+              if (selectedRadio) {
+                  let value = selectedRadio.value;
+                  const otherInput = document.getElementById(`${fieldId}Other`);
+                  if (value === 'Other' && otherInput && otherInput.value.trim() && otherInput.style.display !== 'none') {
+                      value = `Other: ${otherInput.value.trim()}`;
+                  }
+                  return value;
+              }
+              return (forPdf ? 'N/A' : '');
+          } else { // Handles text, number, email, url, date, textarea
+              const value = inputElement.value.trim();
+              return value !== '' ? value : (forPdf ? 'N/A' : '');
+          }
+      };
+
+      // Function to generate HTML content for PDF
+      function generatePdfContent() {
+          let htmlContent = `
+            <div style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; padding: 20px; color: #1e293b;">
+              <h1 style="text-align: center; color: #1e293b; font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem;">Bookkeeping Client Intake Form</h1>
+              <p style="text-align: center; color: #475569; font-size: 1.125rem; margin-bottom: 2rem;">
+                <strong>Xanikton Creations LLC</strong>
+                <br>
+                Completed form for new client onboarding.
+              </p>
+              <hr style="border: 0; height: 1px; background: #e2e8f0; margin: 2rem 0;">
+          `;
+
+          const sections = {
+            'A. Business Information': [
+              'legalBusinessName', 'tradeName', 'legalStructure', 'ein', 'stateOfFormation', 'businessPhysicalAddress',
+              'businessMailingAddress', 'businessPhoneNumber', 'businessEmailAddress', 'businessWebsiteURL',
+              'primaryIndustry', 'productsServicesDescription'
+            ],
+            'B. Principal/Owner Information': [
+              'principalFullName', 'principalTitleRole', 'principalEmailAddress', 'principalPhoneNumber',
+              'preferredCommunicationMethods', 'preferredCommunicationFrequency'
+            ],
+            'C. Existing Accounting Setup & Needs': [
+              'currentAccountingSoftware', 'qboCompanyId', 'fiscalYearEnd', 'booksClosedReconciledDate',
+              'priorTaxReturnsFiled', 'reasonsForSeekingServices', 'biggestFinancialChallenges',
+              'specificFinancialReports', 'collectingSalesTax', 'hasEmployeesContractors', 'payrollProvider'
+            ],
+            // UPDATED Section D content
+            'D. Financial Accounts & QBO Connectivity': [
+              'numAccountsToReconcile', 'accountTypesToReconcile', 'qboConnectionAllowed', 'qboConnectivityDetails'
+            ],
+            'E. Other Relevant Information': [
+              'inventoryTracking', 'expenseCategorizationPreferences', 'upcomingBusinessChanges', 'anythingElse'
+            ]
+          };
+
+          for (const sectionTitle in sections) {
+            htmlContent += `<h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">${sectionTitle}</h2>`;
+            for (const fieldId of sections[sectionTitle]) {
+              const value = getFormattedValue(fieldId, true);
+              if (value !== null) { // Only add if the field is visible/relevant
+                  const labelText = fieldLabels[fieldId] || fieldId;
+                  htmlContent += `
+                    <div style="margin-bottom: 1rem;">
+                      <p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">${labelText}:</p>
+                      <p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${value}</p>
+                    </div>
+                  `;
+              }
+            }
+          }
+
+          htmlContent += `</div>`;
+          return htmlContent;
+      }
+
+
+      // Event Listener for form submission
+      submitFormButton.addEventListener('click', async (event) => { // Changed to async to allow for PDF generation
+          event.preventDefault(); // Prevent default form submission
+
+          if (validateForm()) {
+              if (!navigator.onLine) {
+                  alert('You are currently offline. Your data has been saved locally. Please submit when online.');
+                  return;
+              }
+
+              // Generate PDF content
+              const pdfContentHtml = generatePdfContent();
+              
+              // Configure html2pdf options
+              const pdfOptions = {
+                  margin: 10,
+                  filename: 'Xanikton_Creations_Intake_Form.pdf',
+                  image: { type: 'jpeg', quality: 0.98 },
+                  html2canvas: { scale: 2 },
+                  jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+              };
+
+              // Generate and download PDF
+              await html2pdf().from(pdfContentHtml).set(pdfOptions).save();
+
+              // Construct mailto URI
+              const emailRecipient = 'info@xaniktoncreations.com'; // **CHANGE THIS TO YOUR ACTUAL EMAIL ADDRESS**
+              const emailSubject = 'Completed Bookkeeping Client Intake Form';
+              const emailBodyMessage = 'Dear Xanikton Creations Team,\n\nI have completed the Bookkeeping Client Intake Form. Please find the PDF document attached to this email.\n\nThank you!';
+              const mailtoUri = `mailto:${emailRecipient}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBodyMessage)}`;
+
+              window.location.href = mailtoUri;
+              
+              // Display success message instead of alert
+              if (submissionSuccessMessage) {
+                  submissionSuccessMessage.classList.remove('hidden');
+                  submissionSuccessMessage.style.display = 'block'; // Ensure it's visible
+                  // Announce for screen readers
+                  autosaveStatus.textContent = 'Success! Your form has been downloaded. Please manually attach the PDF file to the email draft that will now open.';
+              }
+              // Optionally scroll to the top to make the success message visible
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+          } else {
+              alert('Please correct the errors in the form before submitting.');
+              // Scroll to the first error
+              const firstError = document.querySelector('.error-message:not(.hidden)');
+              if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+          }
+      });
+
+      // Event Listener for Print button
+      printFormButton.addEventListener('click', () => {
+          window.print();
+      });
+
+      // Event Listener for Clear Form button
+      clearFormButton.addEventListener('click', () => {
+          if (confirm('Are you sure you want to clear all form data? This cannot be undone.')) {
+              form.reset();
+              localStorage.removeItem(LOCAL_STORAGE_KEY);
+              updateConditionalFields(); // Reset conditional visibility
+              clearAllErrors(); // Clear all error messages
+              if (autosaveVisual) autosaveVisual.classList.add('hidden'); // Hide autosave message
+              if (submissionSuccessMessage) submissionSuccessMessage.classList.add('hidden'); // Hide success message
+              autosaveStatus.textContent = ''; // Clear SR-only status
+              alert('All form data has been cleared.');
+          }
+      });
+
+      // Event Listener to dismiss success message
+      dismissSuccessMessageButton.addEventListener('click', () => {
+        if (submissionSuccessMessage) {
+          submissionSuccessMessage.classList.add('hidden');
+          submissionSuccessMessage.style.display = 'none';
+          autosaveStatus.textContent = ''; // Clear SR-only status
+        }
+      });
+
+      // Initial load:
+      document.addEventListener('DOMContentLoaded', () => {
+          loadFormData(); // Load any saved data
+          updateConditionalFields(); // Ensure conditional fields are correct on load
+      });
+    </script>
+</body>
+</html>
