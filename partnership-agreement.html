@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookkeeping Partnership Agreement - Xanikton Ledger</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Cursive Signatures -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Parisienne&display=swap" rel="stylesheet">
+    <!-- Custom Tailwind config for extended colors -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'primary-bg': '#f8fafc', // Slate-50
+              'secondary-bg': '#e2e8f0', // Slate-200
+              'primary-text': '#1e293b', // Slate-800
+              'secondary-text': '#475569', // Slate-600
+              'accent-500': '#3b82f6', // Blue-500
+              'accent-600': '#2563eb', // Blue-600
+              'accent-100': '#dbeafe', // Blue-100
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Basic styles to ensure form looks good and errors are clear */
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      }
+      .error-message {
+        color: #ef4444; /* Red-500 */
+        font-size: 0.875rem; /* text-sm */
+        margin-top: 0.25rem;
+      }
+      .input-error {
+        border-color: #ef4444; /* Red-500 */
+      }
+      .input-error:focus {
+        --tw-ring-color: #ef4444;
+        --tw-border-color: #ef4444;
+      }
+      .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
+      }
+      /* Ensure readonly inputs are styled distinctly */
+      input[readonly], textarea[readonly] {
+          background-color: #f0f4f8; /* Light gray background */
+          color: #64748b; /* Slate-500 */
+          border-color: #cbd5e1; /* Slate-300 */
+          cursor: not-allowed;
+      }
+      /* Signature Pad Styles */
+      #signaturePadCanvas {
+          border: 1px solid #cbd5e1; /* Slate-300 */
+          background-color: #ffffff;
+          cursor: crosshair;
+      }
+      #savedDrawingDisplay {
+          border: 1px solid #e2e8f0;
+          margin-top: 1rem;
+          max-width: 100%;
+          height: auto;
+      }
+      #typedSignatureDisplay {
+          min-height: 40px; /* Ensure visibility for empty typed signatures */
+          padding: 5px;
+          background-color: #fff;
+      }
+
+
+      /* Print styles */
+      @media print {
+        body {
+          background-color: #fff;
+        }
+        .form-container {
+          box-shadow: none;
+          border: none;
+          max-width: none;
+          padding: 0;
+        }
+        header {
+          text-align: left;
+          margin-bottom: 20px;
+        }
+        h1 {
+          font-size: 1.5rem !important;
+          margin-bottom: 5px !important;
+        }
+        header p {
+          font-size: 0.875rem !important;
+          max-width: none !important;
+        }
+        .form-actions {
+          display: none; /* Hide buttons when printing */
+        }
+        #autosaveVisual, #submissionSuccessMessage {
+            display: none !important; /* Hide notifications when printing */
+        }
+        section {
+          page-break-inside: avoid;
+          margin-bottom: 20px;
+        }
+        .section-title {
+          font-size: 1.25rem;
+          margin-bottom: 10px;
+          border-bottom: 1px solid #e2e8f0;
+          padding-bottom: 10px;
+        }
+        label {
+          font-weight: 600;
+          font-size: 0.875rem;
+          margin-bottom: 4px;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="date"], textarea, select, input[type="number"] {
+          border: 1px solid #d1d5db; /* Gray-300 */
+          padding: 8px;
+          min-height: 2.5rem; /* Ensure input fields have height */
+          font-size: 0.875rem;
+          background-color: #f9fafb; /* Light background for fields */
+        }
+        input[readonly], textarea[readonly] {
+            background-color: #fff; /* White background for print */
+            border-color: #e2e8f0; /* Lighter border */
+        }
+        textarea {
+          min-height: 80px;
+        }
+        /* Hide signature pad elements for print, only show saved image */
+        #signaturePadCanvas, #clearDrawingButton, #saveDrawingButton,
+        #signatureMethodType, #signatureMethodDraw, #typedSignatureText,
+        #typedSignatureFont, #clearTypedSignatureButton, #saveTypedSignatureButton,
+        #signatureMethodToggle { /* Hide the radio buttons and their labels */
+            display: none !important;
+        }
+        #savedDrawingDisplay, #typedSignatureDisplay {
+            display: block !important; /* Ensure the chosen signature displays */
+        }
+      }
+    </style>
+</head>
+<body class="bg-primary-bg text-primary-text antialiased font-sans">
+    <div id="root" class="min-h-screen bg-primary-bg p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+      <div class="max-w-4xl mx-auto w-full bg-white shadow-lg rounded-xl p-6 sm:p-8 lg:p-10 border border-gray-200 form-container">
+        
+        <!-- Supabase Auth Container -->
+        <div id="auth-flow-container" class="space-y-6 text-center">
+            <h1 class="text-4xl font-extrabold text-primary-text mb-3 leading-tight">
+                Welcome to The Xanikton Ledger Client Portal!
+            </h1>
+            <p class="text-lg text-secondary-text max-w-2xl mx-auto mb-6">
+                Please enter your email address to securely access your forms. We'll send you a magic link to log in instantly.
+            </p>
+            <form id="client-auth-form" class="max-w-md mx-auto space-y-4">
+                <div>
+                    <label for="client-email-input" class="sr-only">Your Email Address</label>
+                    <input
+                        id="client-email-input"
+                        type="email"
+                        placeholder="your.email@example.com"
+                        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm"
+                        required
+                    />
+                </div>
+                <button
+                    type="submit"
+                    class="w-full px-4 py-2 bg-accent-600 text-white font-semibold rounded-lg shadow-md hover:bg-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 transition duration-200 ease-in-out"
+                >
+                    Send Magic Link
+                </button>
+                <p id="client-auth-message" class="text-center mt-4 text-sm"></p>
+            </form>
+            <div id="access-denied-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                <strong class="font-bold">Access Denied!</strong>
+                <span class="block sm:inline">Your email address is not authorized to access this form. Please contact Xanikton Ledger if you believe this is an error.</span>
+            </div>
+        </div>
+
+        <!-- Actual Form Content (Hidden by default) -->
+        <div id="form-content" class="hidden">
+            <header class="text-center mb-10">
+              <h1 class="text-4xl font-extrabold text-primary-text mb-3 leading-tight">
+                Bookkeeping Partnership Agreement
+              </h1>
+              <p class="text-lg text-secondary-text max-w-2xl mx-auto">
+                This Agreement sets out the friendly, professional terms for how The Xanikton Ledger (that’s us, the Bookkeeper!) will work with you to manage your financial records. Our goal is to make sure we're both clear on the scope, responsibilities, and fees for this key part of your business.
+              </p>
+            </header>
+
+            <!-- Autosave and Submission Status -->
+            <div id="autosaveStatus" role="status" aria-live="polite" class="sr-only"></div>
+            <p id="autosaveVisual" class="text-xs text-gray-500 mt-2 text-center mb-6">Your progress is automatically saved. Last saved: <span id="lastSavedTimestamp">Never</span></p>
+
+            <div id="submissionSuccessMessage" role="alert" aria-live="assertive" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6">
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline">Your Partnership Agreement has been downloaded. Please *manually attach* the "Xanikton_Partnership_Agreement.pdf" file to the email draft that will now open.</span>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" id="dismissSuccessMessage">
+                    <svg class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                </span>
+            </div>
+
+            <form id="partnershipAgreementForm" class="space-y-10" novalidate>
+              <!-- The Parties in Partnership -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">The Parties in Partnership</h2>
+                  <p class="text-md text-secondary-text">This Agreement is active starting on the Effective Date.</p>
+                </div>
+                
+                <div class="mb-6">
+                  <label for="effectiveDate" class="block text-sm font-medium text-secondary-text mb-1">
+                    Effective Date <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="effectiveDate"
+                    name="effectiveDate"
+                    type="date"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="effectiveDate-error" class="error-message hidden" role="alert"></p>
+                </div>
+
+                <!-- Bookkeeper Details (Read-only) -->
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">The Xanikton Ledger (The Bookkeeper)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="mb-4">
+                        <label for="bookkeeperOwner" class="block text-sm font-medium text-secondary-text mb-1">Owner/President</label>
+                        <input id="bookkeeperOwner" name="bookkeeperOwner" type="text" value="Rochelle Hylton" readonly class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="bookkeeperAddress" class="block text-sm font-medium text-secondary-text mb-1">Business Address</label>
+                        <input id="bookkeeperAddress" name="bookkeeperAddress" type="text" value="Asheville, NC" readonly class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="bookkeeperEmail" class="block text-sm font-medium text-secondary-text mb-1">Email</label>
+                        <input id="bookkeeperEmail" name="bookkeeperEmail" type="email" value="xaniktoncreations@gmail.com" readonly class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="bookkeeperWebsite" class="block text-sm font-medium text-secondary-text mb-1">Website</label>
+                        <input id="bookkeeperWebsite" name="bookkeeperWebsite" type="url" value="https://xaniktoncreations.square.site/" readonly class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm" />
+                    </div>
+                </div>
+
+                <!-- Client Details -->
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">Client Company Information</h3>
+                <div class="mb-6">
+                  <label for="clientCompanyName" class="block text-sm font-medium text-secondary-text mb-1">
+                    Client Company Name <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="clientCompanyName"
+                    name="clientCompanyName"
+                    type="text"
+                    placeholder="e.g., Your Business Name LLC"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="clientCompanyName-error" class="error-message hidden" role="alert"></p>
+                </div>
+                <div class="mb-6">
+                  <label for="clientBusinessAddress" class="block text-sm font-medium text-secondary-text mb-1">
+                    Client Business Address <span class="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    id="clientBusinessAddress"
+                    name="clientBusinessAddress"
+                    rows="3"
+                    placeholder="Street Address, City, State, Zip Code"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out resize-y"
+                    required
+                  ></textarea>
+                  <p id="clientBusinessAddress-error" class="error-message hidden" role="alert"></p>
+                </div>
+                <div class="mb-6">
+                  <label for="clientContactName" class="block text-sm font-medium text-secondary-text mb-1">
+                    Client Contact Person <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="clientContactName"
+                    name="clientContactName"
+                    type="text"
+                    placeholder="First Name Last Name"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="clientContactName-error" class="error-message hidden" role="alert"></p>
+                </div>
+                <div class="mb-6">
+                  <label for="clientContactEmail" class="block text-sm font-medium text-secondary-text mb-1">
+                    Client Contact Email <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="clientContactEmail"
+                    name="clientContactEmail"
+                    type="email"
+                    placeholder="e.g., contact@yourbusiness.com"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="clientContactEmail-error" class="error-message hidden" role="alert"></p>
+                </div>
+                <div class="mb-6">
+                  <label for="clientContactPhone" class="block text-sm font-medium text-secondary-text mb-1">
+                    Client Contact Phone <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="clientContactPhone"
+                    name="clientContactPhone"
+                    type="tel"
+                    placeholder="e.g., (123) 456-7890"
+                    pattern="^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$"
+                    title="Please enter a valid phone number (e.g., (123) 456-7890)"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="clientContactPhone-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </section>
+
+              <!-- 1. Our Standard Monthly Services -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">1. Our Standard Monthly Services</h2>
+                  <p class="text-md text-secondary-text">The Bookkeeper agrees to provide the following Standard Monthly Services ("Services").</p>
+                </div>
+
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">A. What We Handle Every Month:</h3>
+                <ul class="list-disc list-inside space-y-2 text-primary-text mb-6 pl-5">
+                    <li><strong>Transaction Recording:</strong> We’ll record all financial transactions (income and expenses) from your linked business bank and credit card accounts directly into QuickBooks Online (QBO).</li>
+                    <li><strong>Categorization:</strong> We’ll categorize transactions following the Chart of Accounts we mutually agree upon.</li>
+                    <li>
+                        <strong>Account Reconciliation:</strong> We’ll reconcile up to 
+                        <input type="number" id="numBankAccounts" name="numBankAccounts" min="0" placeholder="e.g., 1" required class="inline-block w-20 p-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm" />
+                        business bank account(s) and 
+                        <input type="number" id="numCreditCardAccounts" name="numCreditCardAccounts" min="0" placeholder="e.g., 1" required class="inline-block w-20 p-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm" />
+                        business credit card account(s) monthly.
+                        <p id="numBankAccounts-error" class="error-message hidden" role="alert"></p>
+                        <p id="numCreditCardAccounts-error" class="error-message hidden" role="alert"></p>
+                    </li>
+                    <li><strong>Cash Management:</strong> We’ll record cash transactions and deposits based on our defined process ("Recurring Transaction Template for Cash Deposits" SOP).</li>
+                    <li><strong>Sales Integration:</strong> We’ll record sales data and activity from any e-commerce platforms you use (like Square Site or Shopify).</li>
+                    <li><strong>Fee Tracking:</strong> We’ll record all relevant payment processing fees.</li>
+                    <li><strong>Reporting:</strong> We’ll generate your monthly Profit & Loss (Income Statement) and Balance Sheet reports.</li>
+                    <li>
+                        <strong>Review Call:</strong> You get one (1) dedicated monthly review call (up to 30 minutes) to chat about your reports and answer any questions you have.
+                    </li>
+                </ul>
+
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">B. What is Not Included:</h3>
+                <p class="text-secondary-text mb-4">
+                    To keep our focus sharp and our pricing clear, the following are not part of the Standard Monthly Services package unless we agree on a separate written add-on:
+                </p>
+                <ul class="list-disc list-inside space-y-2 text-primary-text mb-6 pl-5">
+                    <li>Tax Preparation/Filing: This includes income tax, payroll tax, or other compliance filings (Sales tax filing can be an add-on).</li>
+                    <li>Formal Audits: We do not provide auditing or assurance services.</li>
+                    <li>Advisory: This means financial planning or investment advice.</li>
+                    <li>Payroll: Payroll processing is excluded (unless specified as an an add-on).</li>
+                    <li>Legal Advice: We are bookkeepers, not lawyers!</li>
+                    <li>Inventory: Complex inventory management beyond basic QBO tracking (e.g., physical counts or advanced Cost of Goods Sold calculations).</li>
+                    <li>Historical Cleanup: Any work for periods before the "Go-Live" Date is quoted separately.</li>
+                </ul>
+
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">C. Engagement Start Date ("Go-Live" Date):</h3>
+                <div class="mb-6">
+                  <label for="goLiveDate" class="block text-sm font-medium text-secondary-text mb-1">
+                    We’ll start actively managing your books for the period beginning <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="goLiveDate"
+                    name="goLiveDate"
+                    type="date"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="goLiveDate-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </section>
+
+              <!-- 2. What We Need From You (Client Responsibilities) -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">2. What We Need From You (Client Responsibilities)</h2>
+                  <p class="text-md text-secondary-text">For us to keep your books perfect and on time, we need your partnership on the following tasks:</p>
+                </div>
+
+                <ul class="list-disc list-inside space-y-2 text-primary-text mb-6 pl-5">
+                    <li><strong>Timeliness:</strong> Provide accurate financial information and documents right away when we ask for them (refer to "Bookkeeping Client Document Checklist").</li>
+                    <li><strong>Access:</strong> Grant us the necessary access to your QuickBooks Online, bank accounts, credit card accounts, POS systems, and other relevant platforms (following the "Secure Information Request & Access Instructions").</li>
+                    <li><strong>Communication:</strong> Respond quickly to our questions and requests for clarification.</li>
+                    <li><strong>Documentation:</strong> Ensure all receipts and financial documents are provided to us in an organized and timely manner.</li>
+                    <li><strong>Updates:</strong> Notify us immediately of any changes to bank accounts, credit cards, or systems that affect our access.</li>
+                    <li>
+                        <strong>Review:</strong> Review the financial reports we send you and let us know about any questions or concerns within 
+                        <input type="number" id="reviewDays" name="reviewDays" min="1" placeholder="e.g., 7" required class="inline-block w-20 p-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm" />
+                        days of receiving them.
+                        <p id="reviewDays-error" class="error-message hidden" role="alert"></p>
+                    </li>
+                </ul>
+              </section>
+
+              <!-- 3. Fees and Payment -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">3. Fees and Payment</h2>
+                </div>
+
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">A. Monthly Retainer Fee:</h3>
+                <div class="mb-6">
+                  <label for="monthlyFeeAmount" class="block text-sm font-medium text-secondary-text mb-1">
+                    You agree to pay a predictable monthly retainer fee of $
+                  </label>
+                  <input
+                    id="monthlyFeeAmount"
+                    name="monthlyFeeAmount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="e.g., 500.00"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="monthlyFeeAmount-error" class="error-message hidden" role="alert"></p>
+                </div>
+
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">B. When and How to Pay:</h3>
+                <div class="mb-6">
+                  <label for="paymentDay" class="block text-sm font-medium text-secondary-text mb-1">
+                    The monthly retainer fee is due in advance on the 
+                    <input type="number" id="paymentDay" name="paymentDay" min="1" max="31" placeholder="e.g., 1" required class="inline-block w-20 p-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm" />
+                    of each month for the upcoming month's services.
+                    <p id="paymentDay-error" class="error-message hidden" role="alert"></p>
+                  </label>
+                </div>
+                <div class="mb-6">
+                  <label for="paymentMethod" class="block text-sm font-medium text-secondary-text mb-1">
+                    Payment will be made via <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="paymentMethod"
+                    name="paymentMethod"
+                    type="text"
+                    placeholder="e.g., ACH transfer, secure online payment link"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="paymentMethod-error" class="error-message hidden" role="alert"></p>
+                </div>
+
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">C. Late Payments:</h3>
+                <ul class="list-disc list-inside space-y-2 text-primary-text mb-6 pl-5">
+                    <li>
+                        If a payment isn't received within 
+                        <input type="number" id="latePaymentDays" name="latePaymentDays" min="1" placeholder="e.g., 5" required class="inline-block w-20 p-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm" />
+                        days of the due date, a late fee will be applied.
+                        <p id="latePaymentDays-error" class="error-message hidden" role="alert"></p>
+                    </li>
+                    <li>
+                        This fee will be 
+                        <input type="number" id="lateFeePercentage" name="lateFeePercentage" min="0" max="100" step="0.01" placeholder="e.g., 5" required class="inline-block w-20 p-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm" />
+                        % of the outstanding balance or $
+                        <input type="number" id="lateFeeFixedAmount" name="lateFeeFixedAmount" min="0" step="0.01" placeholder="e.g., 50.00" required class="inline-block w-24 p-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm" />
+                        , whichever is greater.
+                        <p id="lateFeePercentage-error" class="error-message hidden" role="alert"></p>
+                        <p id="lateFeeFixedAmount-error" class="error-message hidden" role="alert"></p>
+                    </li>
+                    <li>If payment is delayed, we may need to pause our services until all outstanding invoices are cleared.</li>
+                </ul>
+
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">D. Out-of-Scope Work:</h3>
+                <div class="mb-6">
+                  <label for="hourlyRate" class="block text-sm font-medium text-secondary-text mb-1">
+                    If you request services outside of Section 1.A (e.g., historical cleanup, custom urgent reports, extra account reconciliations), we will bill that work at an hourly rate of $
+                  </label>
+                  <input
+                    id="hourlyRate"
+                    name="hourlyRate"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="e.g., 100.00"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="hourlyRate-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </section>
+
+              <!-- 4. Term and Ending Our Partnership -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">4. Term and Ending Our Partnership</h2>
+                </div>
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">A. Term:</h3>
+                <p class="text-primary-text mb-6 pl-5">
+                    This Agreement starts on the Effective Date and continues month-to-month until either party decides to terminate it.
+                </p>
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">B. Standard Termination:</h3>
+                <div class="mb-6 pl-5">
+                    <label for="terminationNoticeDays" class="block text-sm font-medium text-secondary-text mb-1">
+                        Either of us can end this Agreement by giving the other 
+                        <input type="number" id="terminationNoticeDays" name="terminationNoticeDays" min="1" placeholder="e.g., 30" required class="inline-block w-20 p-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm" />
+                        days' written notice.
+                        <p id="terminationNoticeDays-error" class="error-message hidden" role="alert"></p>
+                    </label>
+                    <p class="text-primary-text mt-2">When terminating, you agree to pay for all Services we've rendered up to the final date.</p>
+                </div>
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">C. Termination for Cause:</h3>
+                <p class="text-primary-text mb-6 pl-5">
+                    The Bookkeeper reserves the right to end this Agreement immediately if certain situations arise, including, but not limited to: consistent failure to pay fees, consistently failing to provide necessary information, or if we suspect any illegal activity.
+                </p>
+              </section>
+
+              <!-- 5. Confidentiality -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">5. Confidentiality</h2>
+                </div>
+                <p class="text-primary-text mb-6">
+                    We treat your business data like gold. The Bookkeeper promises to maintain strict confidentiality regarding all your financial and business information. We will not share this information with anyone else unless required by law or with your explicit, written permission.
+                </p>
+              </section>
+
+              <!-- 6. Limitation of Liability -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">6. Limitation of Liability</h2>
+                </div>
+                <p class="text-primary-text mb-6">
+                    We promise to perform all Services professionally and diligently. However, we aren't responsible for errors or omissions that result from incomplete, inaccurate, or late information you provide to us. Our liability under this Agreement is limited to the fees you paid for the Services during the month when the error or omission occurred. We are not responsible for tax advice or any tax penalties you incur.
+                </p>
+              </section>
+
+              <!-- 7. Governing Law -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">7. Governing Law</h2>
+                </div>
+                <p class="text-primary-text mb-6">
+                    This Agreement is governed by the laws of the State of North Carolina.
+                </p>
+              </section>
+
+              <!-- 8. Entire Agreement -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">8. Entire Agreement</h2>
+                </div>
+                <p class="text-primary-text mb-6">
+                    This document, along with any attachments, represents the complete understanding between us. It replaces any previous conversations, agreements, or negotiations.
+                </p>
+              </section>
+
+              <!-- Signatures -->
+              <section>
+                <div class="mb-8 border-b border-gray-200 pb-4 section-title">
+                  <h2 class="text-2xl font-extrabold text-primary-text mb-2">Signatures</h2>
+                  <p class="text-md text-secondary-text">By signing below, the Parties confirm they understand and agree to the terms of this working relationship.</p>
+                </div>
+
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">Bookkeeper: The Xanikton Ledger</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="mb-4">
+                        <label for="bookkeeperSignName" class="block text-sm font-medium text-secondary-text mb-1">Name</label>
+                        <input id="bookkeeperSignName" name="bookkeeperSignName" type="text" value="Rochelle Hylton" readonly class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="bookkeeperSignTitle" class="block text-sm font-medium text-secondary-text mb-1">Title</label>
+                        <input id="bookkeeperSignTitle" name="bookkeeperSignTitle" type="text" value="Owner/President" readonly class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm" />
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-semibold text-primary-text mt-8 mb-4">Client:</h3>
+                <div class="mb-6">
+                  <label for="clientSignatureName" class="block text-sm font-medium text-secondary-text mb-1">
+                    Client Contact Name (Printed) <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="clientSignatureName"
+                    name="clientSignatureName"
+                    type="text"
+                    placeholder="First Name Last Name"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="clientSignatureName-error" class="error-message hidden" role="alert"></p>
+                </div>
+                <div class="mb-6">
+                  <label for="clientSignatureTitle" class="block text-sm font-medium text-secondary-text mb-1">
+                    Client Title <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="clientSignatureTitle"
+                    name="clientSignatureTitle"
+                    type="text"
+                    placeholder="e.g., Owner, CEO"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="clientSignatureTitle-error" class="error-message hidden" role="alert"></p>
+                </div>
+                 <div class="mb-6">
+                  <label for="agreementDate" class="block text-sm font-medium text-secondary-text mb-1">
+                    Date <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="agreementDate"
+                    name="agreementDate"
+                    type="date"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                    required
+                  />
+                  <p id="agreementDate-error" class="error-message hidden" role="alert"></p>
+                </div>
+
+                <!-- Signature Method Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-secondary-text mb-1" id="signatureMethodToggle">
+                        Client Signature <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex items-center space-x-6 mb-4 mt-2">
+                        <div class="flex items-center">
+                            <input id="signatureMethodDraw" name="signatureMethod" type="radio" value="drawn" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" checked aria-controls="signatureDrawArea" />
+                            <label for="signatureMethodDraw" class="ml-2 text-sm text-primary-text">Draw Signature</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="signatureMethodType" name="signatureMethod" type="radio" value="typed" class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300" aria-controls="signatureTypeArea" />
+                            <label for="signatureMethodType" class="ml-2 text-sm text-primary-text">Type Signature</label>
+                        </div>
+                    </div>
+
+                    <!-- Draw Signature Area -->
+                    <div id="signatureDrawArea" class="space-y-4">
+                        <canvas 
+                            id="signaturePadCanvas" 
+                            width="400" 
+                            height="150" 
+                            class="mt-1 border border-gray-300 rounded-md"
+                            aria-label="Signature Pad"
+                            aria-describedby="signatureCombinedError"
+                        ></canvas>
+                        <div class="flex space-x-2">
+                            <button
+                                type="button"
+                                id="clearDrawingButton"
+                                class="px-4 py-2 bg-secondary-bg text-secondary-text font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition duration-150 ease-in-out text-sm"
+                            >
+                                Clear Drawing
+                            </button>
+                            <button
+                                type="button"
+                                id="saveDrawingButton"
+                                class="px-4 py-2 bg-accent-500 text-white font-semibold rounded-md shadow-sm hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 transition duration-150 ease-in-out text-sm"
+                            >
+                                Save Drawing
+                            </button>
+                        </div>
+                        <img id="savedDrawingDisplay" alt="Saved Drawn Signature" style="display: none; max-width: 400px; border: 1px dashed #ccc; padding: 5px; background-color: #fff;" />
+                    </div>
+
+                    <!-- Type Signature Area -->
+                    <div id="signatureTypeArea" class="space-y-4" style="display: none;">
+                        <p class="text-sm text-gray-500 italic mb-2">
+                            By choosing to type your signature and selecting a font, you acknowledge and agree that this digital representation is intended to be legally binding and equivalent to a handwritten signature.
+                        </p>
+                        <input
+                            id="typedSignatureText"
+                            name="typedSignatureText"
+                            type="text"
+                            placeholder="Type your full name here"
+                            class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out"
+                            aria-describedby="signatureCombinedError"
+                        />
+                        <div class="mt-2">
+                            <label for="typedSignatureFont" class="block text-sm font-medium text-secondary-text mb-1">
+                                Select a Cursive Font <span class="text-red-500">*</span>
+                            </label>
+                            <select id="typedSignatureFont" name="typedSignatureFont" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm transition duration-150 ease-in-out">
+                                <option value="">-- Choose Font --</option>
+                                <option value="Dancing Script, cursive" style="font-family: 'Dancing Script', cursive;">Dancing Script</option>
+                                <option value="Great Vibes, cursive" style="font-family: 'Great Vibes', cursive;">Great Vibes</option>
+                                <option value="Parisienne, cursive" style="font-family: 'Parisienne', cursive;">Parisienne</option>
+                            </select>
+                        </div>
+                        <div class="mt-4 flex space-x-2">
+                            <button
+                                type="button"
+                                id="clearTypedSignatureButton"
+                                class="px-4 py-2 bg-secondary-bg text-secondary-text font-semibold rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition duration-150 ease-in-out text-sm"
+                            >
+                                Clear Typed Signature
+                            </button>
+                            <button
+                                type="button"
+                                id="saveTypedSignatureButton"
+                                class="px-4 py-2 bg-accent-500 text-white font-semibold rounded-md shadow-sm hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 transition duration-150 ease-in-out text-sm"
+                            >
+                                Save Typed Signature
+                            </button>
+                        </div>
+                        <p id="typedSignatureDisplay" class="mt-4 text-3xl hidden" style="border-bottom: 1px dashed #ccc; padding-bottom: 5px;"></p>
+                    </div>
+                    <p id="signatureCombinedError" class="error-message hidden" role="alert"></p>
+                    <!-- Hidden inputs to store the final signature data -->
+                    <input type="hidden" id="finalSignatureType" name="finalSignatureType" value="drawn" />
+                    <input type="hidden" id="finalSignatureValue" name="finalSignatureValue" />
+                    <input type="hidden" id="finalSignatureFont" name="finalSignatureFont" />
+                </div>
+
+                <div class="flex items-center mb-6">
+                    <input
+                        id="agreeToTerms"
+                        name="agreeToTerms"
+                        type="checkbox"
+                        class="focus:ring-accent-500 h-4 w-4 text-accent-600 border-gray-300 rounded"
+                        required
+                    />
+                    <label for="agreeToTerms" class="ml-2 block text-sm text-primary-text">
+                        I agree to the terms and conditions outlined in this Bookkeeping Partnership Agreement. <span class="text-red-500">*</span>
+                    </label>
+                    <p id="agreeToTerms-error" class="error-message hidden" role="alert"></p>
+                </div>
+              </section>
+
+              <div class="flex justify-end mt-10 space-x-4 form-actions">
+                <button
+                  type="button"
+                  id="clearFormButton"
+                  class="px-8 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200 ease-in-out"
+                >
+                  Clear Form
+                </button>
+                <button
+                  type="button"
+                  id="printFormButton"
+                  class="px-8 py-3 bg-secondary-bg text-secondary-text font-semibold rounded-lg shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition duration-200 ease-in-out"
+                >
+                  Print for My Records
+                </button>
+                <button
+                  type="submit"
+                  id="submitFormButton"
+                  class="px-8 py-3 bg-accent-600 text-white font-semibold rounded-lg shadow-md hover:bg-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 transition duration-200 ease-in-out"
+                >
+                  Submit Agreement
+                </button>
+              </div>
+            </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- html2pdf.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsIDtaTqilKTwQasNJRpeT1tkt0RtLDKefMnsHSQrXKNCgPZXTcwsHk5LhXgKqLg2Nzm0jCgLzC4/E0EiyWdRw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      // Supabase Client Initialization
+      // IMPORTANT: Replace with your actual Supabase Project URL and Anon Key
+      const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., 'https://abcde12345.supabase.co'
+      const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // e.g., 'eyJhbGciOiJIUzI1Ni...'
+
+      const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const LOCAL_STORAGE_KEY = 'xanikton_partnership_agreement_form_data_vanilla';
+      const PREFILL_STORAGE_KEY = 'xanikton_client_prefill_data'; // Key from intake form
+      const form = document.getElementById('partnershipAgreementForm');
+      const submitFormButton = document.getElementById('submitFormButton');
+      const printFormButton = document.getElementById('printFormButton');
+      const clearFormButton = document.getElementById('clearFormButton');
+      const autosaveStatus = document.getElementById('autosaveStatus'); // SR-only autosave
+      const autosaveVisual = document.getElementById('autosaveVisual'); // Visible autosave
+      const lastSavedTimestamp = document.getElementById('lastSavedTimestamp'); // Timestamp span
+      const submissionSuccessMessage = document.getElementById('submissionSuccessMessage');
+      const dismissSuccessMessageButton = document.getElementById('dismissSuccessMessage');
+
+      let inputElements = Array.from(form.querySelectorAll('input, textarea, select')); // Dynamically update this list to include select
+
+      // Signature Pad elements
+      const signatureMethodDrawRadio = document.getElementById('signatureMethodDraw');
+      const signatureMethodTypeRadio = document.getElementById('signatureMethodType');
+      const signatureDrawArea = document.getElementById('signatureDrawArea');
+      const signatureTypeArea = document.getElementById('signatureTypeArea');
+
+      const signaturePadCanvas = document.getElementById('signaturePadCanvas');
+      const ctx = signaturePadCanvas.getContext('2d');
+      const savedDrawingDisplay = document.getElementById('savedDrawingDisplay');
+      const clearDrawingButton = document.getElementById('clearDrawingButton');
+      const saveDrawingButton = document.getElementById('saveDrawingButton');
+
+      const typedSignatureText = document.getElementById('typedSignatureText');
+      const typedSignatureFont = document.getElementById('typedSignatureFont');
+      const typedSignatureDisplay = document.getElementById('typedSignatureDisplay');
+      const clearTypedSignatureButton = document.getElementById('clearTypedSignatureButton');
+      const saveTypedSignatureButton = document.getElementById('saveTypedSignatureButton');
+
+      const finalSignatureTypeInput = document.getElementById('finalSignatureType');
+      const finalSignatureValueInput = document.getElementById('finalSignatureValue');
+      const finalSignatureFontInput = document.getElementById('finalSignatureFont');
+      const signatureCombinedError = document.getElementById('signatureCombinedError');
+
+      // Supabase Auth Elements
+      const authFlowContainer = document.getElementById('auth-flow-container');
+      const clientAuthForm = document.getElementById('client-auth-form');
+      const clientEmailInput = document.getElementById('client-email-input');
+      const clientAuthMessage = document.getElementById('client-auth-message');
+      const formContent = document.getElementById('form-content');
+      const accessDeniedMessage = document.getElementById('access-denied-message');
+
+
+      let isDrawing = false;
+      let lastX = 0;
+      let lastY = 0;
+
+      // --- Supabase Authentication and Authorization Functions ---
+
+      async function handleClientLogin(event) {
+          event.preventDefault();
+          clientAuthMessage.textContent = ''; // Clear previous messages
+          const email = clientEmailInput.value.trim();
+          if (!email) {
+              clientAuthMessage.textContent = 'Please enter your email address.';
+              clientAuthMessage.style.color = '#ef4444';
+              return;
+          }
+
+          const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin + window.location.pathname } });
+
+          if (error) {
+              clientAuthMessage.textContent = `Login failed: ${error.message}`;
+              clientAuthMessage.style.color = '#ef4444';
+          } else {
+              clientAuthMessage.textContent = 'Magic link sent! Check your email to log in.';
+              clientAuthMessage.style.color = '#10b981'; // Green
+          }
+      }
+
+      async function checkClientAuthorization() {
+          const { data: { user } } = await supabase.auth.getUser();
+
+          if (user) {
+              // User is logged in, now check if their email is authorized
+              const { data, error } = await supabase
+                  .from('authorized_client_emails')
+                  .select('email')
+                  .eq('email', user.email)
+                  .single();
+
+              if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found (which is good if not authorized)
+                  console.error('Error checking authorization:', error);
+                  authFlowContainer.classList.remove('hidden');
+                  formContent.classList.add('hidden');
+                  accessDeniedMessage.classList.remove('hidden');
+                  clientAuthForm.classList.add('hidden'); // Hide login form if denied
+              } else if (data) { // Email found, user is authorized
+                  authFlowContainer.classList.add('hidden');
+                  formContent.classList.remove('hidden');
+                  loadFormData(); // Load form data after authorization
+                  prefillClientData(); // Prefill data after authorization
+              } else { // Email not found in authorized list
+                  authFlowContainer.classList.remove('hidden');
+                  formContent.classList.add('hidden');
+                  accessDeniedMessage.classList.remove('hidden');
+                  clientAuthForm.classList.add('hidden'); // Hide login form if denied
+              }
+          } else {
+              // User is not logged in, show login form
+              authFlowContainer.classList.remove('hidden');
+              formContent.classList.add('hidden');
+              accessDeniedMessage.classList.add('hidden'); // Ensure access denied is hidden
+              clientAuthForm.classList.remove('hidden'); // Ensure login form is visible
+          }
+      }
+
+      // --- Existing Form Logic (Unchanged or adapted) ---
+
+      // Helper function to get current date in YYYYMMDD format
+      function getFormattedDate() {
+          const today = new Date();
+          const yyyy = today.getFullYear();
+          const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months start at 0!
+          const dd = String(today.getDate()).padStart(2, '0');
+          return `${yyyy}${mm}${dd}`;
+      }
+
+      // Initialize canvas
+      function initializeSignaturePad() {
+          ctx.clearRect(0, 0, signaturePadCanvas.width, signaturePadCanvas.height);
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.strokeStyle = '#000000'; // Black ink
+      }
+      initializeSignaturePad(); // Call once on script load
+
+      // Drawing functions
+      function startDrawing(e) {
+          if (finalSignatureTypeInput.value !== 'drawn') return; // Only draw if "draw" is selected
+          isDrawing = true;
+          [lastX, lastY] = getCanvasCoordinates(e);
+      }
+
+      function draw(e) {
+          if (!isDrawing) return;
+          e.preventDefault(); // Prevent scrolling on touch devices
+          const [currentX, currentY] = getCanvasCoordinates(e);
+
+          ctx.beginPath();
+          ctx.moveTo(lastX, lastY);
+          ctx.lineTo(currentX, currentY);
+          ctx.stroke();
+          [lastX, lastY] = [currentX, currentY];
+      }
+
+      function stopDrawing() {
+          if (!isDrawing) return; // Only save if drawing was actually happening
+          isDrawing = false;
+          saveDrawnSignature(); // Auto-save after finishing a stroke
+      }
+
+      function getCanvasCoordinates(e) {
+          const rect = signaturePadCanvas.getBoundingClientRect();
+          let clientX, clientY;
+          if (e.touches && e.touches.length > 0) {
+              clientX = e.touches[0].clientX;
+              clientY = e.touches[0].clientY;
+          } else {
+              clientX = e.clientX;
+              clientY = e.clientY;
+          }
+          return [clientX - rect.left, clientY - rect.top];
+      }
+
+      // Clear drawn signature
+      function clearDrawnSignature() {
+          initializeSignaturePad();
+          finalSignatureValueInput.value = '';
+          savedDrawingDisplay.style.display = 'none';
+          savedDrawingDisplay.src = '';
+          clearError('signatureCombinedError'); // Clear error message if present
+          saveFormData(); // Trigger autosave after clearing
+      }
+
+      // Save drawn signature to hidden input
+      function saveDrawnSignature() {
+          if (isCanvasEmpty(signaturePadCanvas)) {
+              finalSignatureValueInput.value = '';
+              savedDrawingDisplay.style.display = 'none';
+              savedDrawingDisplay.src = '';
+          } else {
+              const dataURL = signaturePadCanvas.toDataURL('image/png');
+              finalSignatureValueInput.value = dataURL;
+              savedDrawingDisplay.src = dataURL;
+              savedDrawingDisplay.style.display = 'block';
+              clearError('signatureCombinedError'); // Clear error message if present
+          }
+          finalSignatureTypeInput.value = 'drawn';
+          saveFormData(); // Trigger autosave after saving
+      }
+
+      // Check if canvas is empty (no drawing)
+      function isCanvasEmpty(canvas) {
+          const blank = document.createElement('canvas');
+          blank.width = canvas.width;
+          blank.height = canvas.height;
+          // Compare with an empty canvas data URL
+          // Some browsers might return different string for empty canvas,
+          // so check if it's mostly transparent or just empty white pixels
+          const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          for (let i = 0; i < pixelData.length; i++) {
+              if (pixelData[i] !== 0 && pixelData[i] !== 255) return false; // Not fully transparent or fully white
+          }
+          return true;
+      }
+
+      // Clear typed signature
+      function clearTypedSignature() {
+          typedSignatureText.value = '';
+          typedSignatureFont.value = '';
+          typedSignatureDisplay.textContent = '';
+          typedSignatureDisplay.style.fontFamily = '';
+          typedSignatureDisplay.style.display = 'none';
+          finalSignatureValueInput.value = '';
+          finalSignatureFontInput.value = '';
+          clearError('signatureCombinedError');
+          saveFormData();
+      }
+
+      // Save typed signature
+      function saveTypedSignature() {
+          const text = typedSignatureText.value.trim();
+          const font = typedSignatureFont.value;
+
+          if (text && font) {
+              finalSignatureValueInput.value = text;
+              finalSignatureFontInput.value = font;
+              finalSignatureTypeInput.value = 'typed';
+              typedSignatureDisplay.textContent = text;
+              typedSignatureDisplay.style.fontFamily = font;
+              typedSignatureDisplay.style.display = 'block';
+              clearError('signatureCombinedError');
+          } else {
+              finalSignatureValueInput.value = '';
+              finalSignatureFontInput.value = '';
+              finalSignatureTypeInput.value = '';
+              typedSignatureDisplay.textContent = '';
+              typedSignatureDisplay.style.fontFamily = '';
+              typedSignatureDisplay.style.display = 'none';
+              // Only display error if text input is visible and required
+              if (signatureTypeArea.style.display !== 'none') {
+                if (!text) displayError('signatureCombinedError', 'Typed signature text is required.');
+                if (!font) displayError('signatureCombinedError', 'Please select a font for your typed signature.');
+              }
+          }
+          saveFormData();
+      }
+
+      // Function to show/hide error messages
+      function displayError(id, message) {
+          const errorElement = document.getElementById(id); // Use the provided ID directly
+          if (errorElement) {
+              errorElement.textContent = message;
+              errorElement.classList.remove('hidden');
+          }
+          // For actual input fields, also add error styling
+          const inputElement = document.getElementById(id.replace('-error', '')); // Try to find the associated input
+          if (inputElement && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA' || inputElement.tagName === 'SELECT' || inputElement.tagName === 'CANVAS')) {
+              inputElement.setAttribute('aria-describedby', id);
+              inputElement.setAttribute('aria-invalid', 'true');
+              inputElement.classList.add('input-error');
+          }
+      }
+
+      // Function to clear error messages
+      function clearError(id) {
+          const errorElement = document.getElementById(id); // Use the provided ID directly
+          if (errorElement) {
+              errorElement.textContent = '';
+              errorElement.classList.add('hidden');
+          }
+          const inputElement = document.getElementById(id.replace('-error', ''));
+          if (inputElement && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA' || inputElement.tagName === 'SELECT' || inputElement.tagName === 'CANVAS')) {
+              inputElement.removeAttribute('aria-describedby');
+              inputElement.removeAttribute('aria-invalid');
+              inputElement.classList.remove('input-error');
+          }
+      }
+
+      // Function to clear all error messages and styling from the form
+      function clearAllErrors() {
+          form.querySelectorAll('.error-message').forEach(el => {
+              el.textContent = '';
+              el.classList.add('hidden');
+          });
+          form.querySelectorAll('.input-error').forEach(el => {
+              el.classList.remove('input-error');
+              el.removeAttribute('aria-invalid');
+              el.removeAttribute('aria-describedby');
+          });
+      }
+
+      // Helper for conditional visibility
+      function setDisplay(element, display) {
+          if (element) {
+              element.style.display = display ? 'block' : 'none';
+              // Also manage 'required' attribute for conditional inputs within these areas
+              const inputsInArea = element.querySelectorAll('input, textarea, select');
+              inputsInArea.forEach(input => {
+                  if (input.dataset.originalRequired) { // Only change if it had an original required attribute
+                      input.required = display && (input.dataset.originalRequired === 'true');
+                  }
+              });
+          }
+      }
+
+      function toggleSignatureMethod() {
+          const selectedMethod = form.querySelector('input[name="signatureMethod"]:checked')?.value;
+          
+          if (selectedMethod === 'drawn') {
+              setDisplay(signatureDrawArea, true);
+              setDisplay(signatureTypeArea, false);
+              finalSignatureTypeInput.value = 'drawn';
+              // When switching to draw, ensure type-specific fields are cleared and vice-versa
+              // We'll manage finalSignatureValue/Font when saving or loading
+              clearTypedSignature();
+              clearError('signatureCombinedError');
+          } else if (selectedMethod === 'typed') {
+              setDisplay(signatureDrawArea, false);
+              setDisplay(signatureTypeArea, true);
+              finalSignatureTypeInput.value = 'typed';
+              clearDrawnSignature(); // Clears canvas and hidden input for drawn
+              clearError('signatureCombinedError');
+          }
+          saveFormData(); // Trigger autosave after method change
+      }
+
+      // Store original required status for conditional inputs
+      function storeOriginalRequired() {
+          signatureDrawArea.querySelectorAll('input, textarea, select').forEach(input => {
+              if (input.hasAttribute('required')) {
+                  input.dataset.originalRequired = 'true';
+                  input.removeAttribute('required'); // Temporarily remove to avoid conflicting with display logic
+              }
+          });
+          signatureTypeArea.querySelectorAll('input, textarea, select').forEach(input => {
+              if (input.hasAttribute('required')) {
+                  input.dataset.originalRequired = 'true';
+                  input.removeAttribute('required');
+              }
+          });
+          // Explicitly set required for typedSignatureText and typedSignatureFont when type area is active
+          typedSignatureText.dataset.originalRequired = 'true';
+          typedSignatureFont.dataset.originalRequired = 'true';
+      }
+
+      // Save form data to localStorage
+      function saveFormData() {
+          const data = {};
+          inputElements = Array.from(form.querySelectorAll('input, textarea, select')); // Ensure select is included
+          inputElements.forEach(input => {
+              // Only save if the input is not part of a hidden container based on the *current* active signature method
+              const isHiddenByMethod = (input.closest('#signatureDrawArea') && finalSignatureTypeInput.value === 'typed') ||
+                                       (input.closest('#signatureTypeArea') && finalSignatureTypeInput.value === 'drawn');
+              
+              if (input.closest('div[style*="display: none"]') !== null || isHiddenByMethod) {
+                  return; // Skip hidden elements and elements from inactive signature method
+              }
+              if (input.type === 'radio') {
+                  if (input.checked) {
+                      data[input.name] = input.value;
+                  }
+              } else if (input.type === 'checkbox') {
+                  data[input.name] = input.checked;
+              } else {
+                  data[input.name] = input.value;
+              }
+          });
+          // Explicitly save the final signature data
+          data.finalSignatureType = finalSignatureTypeInput.value;
+          data.finalSignatureValue = finalSignatureValueInput.value;
+          data.finalSignatureFont = finalSignatureFontInput.value;
+
+          const timestamp = new Date().toLocaleString();
+          data.lastSaved = timestamp;
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+
+          if (autosaveVisual) {
+              autosaveVisual.classList.remove('hidden');
+              lastSavedTimestamp.textContent = data.lastSaved;
+          }
+          if (autosaveStatus) {
+            autosaveStatus.textContent = `Agreement progress saved automatically at ${timestamp}.`;
+          }
+      }
+
+      // Load form data from localStorage
+      function loadFormData() {
+          const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+          if (savedData) {
+              const data = JSON.parse(savedData);
+              inputElements.forEach(input => {
+                  if (input.type === 'radio') {
+                      if (data[input.name] === input.value) {
+                          input.checked = true;
+                      }
+                  } else if (input.type === 'checkbox') {
+                      input.checked = data[input.name] || false;
+                  } else {
+                      input.value = data[input.name] || '';
+                  }
+              });
+
+              // Load final signature data and restore UI
+              finalSignatureTypeInput.value = data.finalSignatureType || 'drawn';
+              finalSignatureValueInput.value = data.finalSignatureValue || '';
+              finalSignatureFontInput.value = data.finalSignatureFont || '';
+
+              if (finalSignatureTypeInput.value === 'drawn') {
+                  signatureMethodDrawRadio.checked = true;
+                  if (finalSignatureValueInput.value) {
+                      savedDrawingDisplay.src = finalSignatureValueInput.value;
+                      savedDrawingDisplay.style.display = 'block';
+                      const img = new Image();
+                      img.onload = () => {
+                        initializeSignaturePad();
+                        ctx.drawImage(img, 0, 0, signaturePadCanvas.width, signaturePadCanvas.height);
+                      };
+                      img.src = finalSignatureValueInput.value;
+                  }
+              } else if (finalSignatureTypeInput.value === 'typed') {
+                  signatureMethodTypeRadio.checked = true;
+                  if (finalSignatureValueInput.value) {
+                      typedSignatureText.value = finalSignatureValueInput.value;
+                      typedSignatureFont.value = finalSignatureFontInput.value;
+                      typedSignatureDisplay.textContent = finalSignatureValueInput.value;
+                      typedSignatureDisplay.style.fontFamily = finalSignatureFontInput.value;
+                      typedSignatureDisplay.style.display = 'block';
+                  }
+              }
+
+              toggleSignatureMethod(); // Ensure correct area is visible based on loaded type
+
+              if (data.lastSaved && autosaveVisual) {
+                  autosaveVisual.classList.remove('hidden');
+                  lastSavedTimestamp.textContent = data.lastSaved;
+              }
+          }
+          updateConditionalFields(); // Update visibility after loading data
+      }
+
+      // Function to pre-fill client details from intake form data
+      function prefillClientData() {
+          const prefillDataString = localStorage.getItem(PREFILL_STORAGE_KEY);
+          if (prefillDataString) {
+              const prefillData = JSON.parse(prefillDataString);
+
+              const fieldsToPrefill = {
+                  'clientCompanyName': prefillData.clientCompanyName,
+                  'clientBusinessAddress': prefillData.clientBusinessAddress,
+                  'clientContactName': prefillData.clientContactName,
+                  'clientContactEmail': prefillData.clientContactEmail,
+                  'clientContactPhone': prefillData.clientContactPhone,
+              };
+
+              for (const id in fieldsToPrefill) {
+                  const inputElement = document.getElementById(id);
+                  if (inputElement && fieldsToPrefill[id]) {
+                      inputElement.value = fieldsToPrefill[id];
+                      inputElement.setAttribute('readonly', 'true'); // Make pre-filled fields read-only
+                      inputElement.classList.add('bg-gray-100', 'text-gray-600'); // Add styling for readonly
+                  }
+              }
+              // Clear the prefill data from local storage after use
+              // localStorage.removeItem(PREFILL_STORAGE_KEY); // Keep for debugging if needed, or remove
+          }
+      }
+
+      // Validate the form
+      function validateForm() {
+          let isValid = true;
+          clearAllErrors();
+
+          inputElements = Array.from(form.querySelectorAll('input:not([readonly]), textarea:not([readonly]), select:not([readonly])')); // Only validate editable fields
+
+          inputElements.forEach(input => {
+              if (input.required && input.closest('div[style*="display: none"]') === null && input.type !== 'radio' && input.type !== 'checkbox') {
+                  if (!input.value.trim()) {
+                      const labelText = input.previousElementSibling ? input.previousElementSibling.textContent.replace(' *', '').trim() : input.placeholder || input.id;
+                      displayError(input.id, `${labelText} is required.`);
+                      isValid = false;
+                  } else if (input.type === 'number' && (isNaN(parseFloat(input.value)) || parseFloat(input.value) < parseFloat(input.min || '0') || (input.max && parseFloat(input.value) > parseFloat(input.max)))) {
+                      displayError(input.id, `Please enter a valid number (min: ${input.min || '0'}${input.max ? `, max: ${input.max}` : ''}).`);
+                      isValid = false;
+                  }
+              }
+          });
+
+          // Specific validation for 'agreeToTerms' checkbox
+          const agreeToTermsCheckbox = document.getElementById('agreeToTerms');
+          if (agreeToTermsCheckbox && agreeToTermsCheckbox.required && !agreeToTermsCheckbox.checked) {
+              displayError('agreeToTerms', 'You must agree to the terms and conditions.');
+              isValid = false;
+          }
+
+          // Validate active signature
+          if (!finalSignatureValueInput.value.trim()) {
+              displayError('signatureCombinedError', 'Client Signature is required.');
+              isValid = false;
+          } else if (finalSignatureTypeInput.value === 'typed' && !finalSignatureFontInput.value) {
+              displayError('signatureCombinedError', 'Please select a font for your typed signature.');
+              isValid = false;
+          }
+
+          // Specific Validations (Email, URL, Phone numbers using browser's native pattern validation where available)
+          const emailFields = ['clientContactEmail'];
+          emailFields.forEach(id => {
+              const input = document.getElementById(id);
+              if (input && input.value && input.closest('div[style*="display: none"]') === null && !input.readOnly && !/\S+@\S+\.\S+/.test(input.value)) {
+                  displayError(id, 'Please enter a valid email address.');
+                  isValid = false;
+              }
+          });
+
+          const phoneFields = ['clientContactPhone'];
+          phoneFields.forEach(id => {
+            const input = document.getElementById(id);
+            if (input && input.value && input.closest('div[style*="display: none"]') === null && !input.readOnly && !input.checkValidity()) {
+              displayError(id, input.title || 'Please enter a valid phone number.');
+              isValid = false;
+            }
+          });
+          
+          return isValid;
+      }
+
+      // Event Listener for input changes (for saving and conditional fields)
+      form.addEventListener('input', (event) => {
+          saveFormData();
+          updateConditionalFields();
+          // Clear error on input if it was previously set for single inputs
+          if (event.target.id) clearError(event.target.id);
+          // For radio and checkbox, clear error by its name or a common signature error div
+          const name = event.target.name;
+          if (event.target.type === 'radio' || event.target.type === 'checkbox') {
+             clearError(name);
+          }
+          if (event.target.closest('#signatureDrawArea') || event.target.closest('#signatureTypeArea')) {
+              clearError('signatureCombinedError');
+          }
+
+          // Update typed signature display
+          if (event.target === typedSignatureText || event.target === typedSignatureFont) {
+              typedSignatureDisplay.textContent = typedSignatureText.value;
+              typedSignatureDisplay.style.fontFamily = typedSignatureFont.value;
+              if (typedSignatureText.value.trim() !== '' && typedSignatureFont.value !== '') {
+                  typedSignatureDisplay.style.display = 'block';
+              } else {
+                  typedSignatureDisplay.style.display = 'none';
+              }
+          }
+      });
+
+      // Define a mapping of input IDs to their display labels for PDF generation
+      const fieldLabels = {
+        effectiveDate: 'Effective Date',
+        bookkeeperOwner: 'Bookkeeper Owner/President',
+        bookkeeperAddress: 'Bookkeeper Business Address',
+        bookkeeperEmail: 'Bookkeeper Email',
+        bookkeeperWebsite: 'Bookkeeper Website',
+        clientCompanyName: 'Client Company Name',
+        clientBusinessAddress: 'Client Business Address',
+        clientContactName: 'Client Contact Person',
+        clientContactEmail: 'Client Contact Email',
+        clientContactPhone: 'Client Contact Phone',
+        numBankAccounts: 'Number of Bank Accounts to Reconcile',
+        numCreditCardAccounts: 'Number of Credit Card Accounts to Reconcile',
+        goLiveDate: 'Engagement Go-Live Date',
+        reviewDays: 'Review Period for Reports (days)',
+        monthlyFeeAmount: 'Monthly Retainer Fee',
+        paymentDay: 'Payment Due Day of Month',
+        paymentMethod: 'Preferred Payment Method',
+        latePaymentDays: 'Late Payment Grace Period (days)',
+        lateFeePercentage: 'Late Fee Percentage',
+        lateFeeFixedAmount: 'Late Fee Fixed Amount',
+        hourlyRate: 'Out-of-Scope Hourly Rate',
+        terminationNoticeDays: 'Termination Notice Period (days)',
+        clientSignatureName: 'Client Contact Name (Printed)',
+        clientSignatureTitle: 'Client Title',
+        agreementDate: 'Agreement Date',
+        agreeToTerms: 'Agreed to Terms and Conditions',
+        finalSignatureType: 'Signature Type',
+        finalSignatureValue: 'Signature Value',
+        finalSignatureFont: 'Signature Font'
+      };
+
+      // Helper to get formatted value for PDF/Email
+      const getFormattedValue = (fieldId, forPdf = false) => {
+          const inputElement = document.getElementById(fieldId);
+          if (!inputElement || inputElement.closest('div[style*="display: none"]') !== null) return null; // Skip if element or its container is hidden
+
+          if (inputElement.type === 'checkbox') {
+              return inputElement.checked ? 'Yes' : 'No';
+          } else { // Handles text, number, email, url, date, textarea, select
+              const value = inputElement.value.trim();
+              return value !== '' ? value : (forPdf ? 'N/A' : '');
+          }
+      };
+
+      // Function to generate HTML content for PDF
+      function generatePdfContent() {
+          const finalSignatureType = finalSignatureTypeInput.value;
+          const finalSignatureValue = finalSignatureValueInput.value;
+          const finalSignatureFont = finalSignatureFontInput.value;
+
+          let signatureHtml = '';
+          if (finalSignatureType === 'drawn' && finalSignatureValue) {
+              signatureHtml = `<img src="${finalSignatureValue}" style="max-width: 250px; height: auto; border: 1px dashed #ccc; padding: 5px; background-color: #fff;" alt="Client Signature" />`;
+          } else if (finalSignatureType === 'typed' && finalSignatureValue && finalSignatureFont) {
+              signatureHtml = `<span style="font-family: ${finalSignatureFont}; font-size: 2rem; border-bottom: 1px dashed #ccc; padding-bottom: 5px; display: inline-block;">${finalSignatureValue}</span>`;
+          } else {
+              signatureHtml = 'N/A';
+          }
+
+          let htmlContent = `
+            <div style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; padding: 20px; color: #1e293b;">
+              <h1 style="text-align: center; color: #1e293b; font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem;">Bookkeeping Partnership Agreement</h1>
+              <p style="text-align: center; color: #475569; font-size: 1.125rem; margin-bottom: 2rem;">
+                This Agreement sets out the friendly, professional terms for how The Xanikton Ledger (that’s us, the Bookkeeper!) will work with you to manage your financial records. Our goal is to make sure we're both clear on the scope, responsibilities, and fees for this key part of your business.
+              </p>
+              <hr style="border: 0; height: 1px; background: #e2e8f0; margin: 2rem 0;">
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">The Parties in Partnership</h2>
+              <div style="margin-bottom: 1rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Effective Date:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('effectiveDate', true)}</p></div>
+
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">The Xanikton Ledger (The Bookkeeper)</h3>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Owner/President:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">Rochelle Hylton</p></div>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Business Address:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">Asheville, NC</p></div>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Email:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">xaniktoncreations@gmail.com</p></div>
+              <div style="margin-bottom: 1rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Website:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">https://xaniktoncreations.square.site/</p></div>
+
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">Client Company Information</h3>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Client Company Name:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('clientCompanyName', true)}</p></div>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Client Business Address:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('clientBusinessAddress', true)}</p></div>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Client Contact Person:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('clientContactName', true)}</p></div>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Client Contact Email:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('clientContactEmail', true)}</p></div>
+              <div style="margin-bottom: 1rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Client Contact Phone:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('clientContactPhone', true)}</p></div>
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">1. Our Standard Monthly Services</h2>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">A. What We Handle Every Month:</h3>
+              <ul style="list-style-type: disc; margin-left: 25px; margin-bottom: 1rem; font-size: 1rem; color: #1e293b;">
+                  <li><strong>Transaction Recording:</strong> We’ll record all financial transactions (income and expenses) from your linked business bank and credit card accounts directly into QuickBooks Online (QBO).</li>
+                  <li><strong>Categorization:</strong> We’ll categorize transactions following the Chart of Accounts we mutually agree upon.</li>
+                  <li><strong>Account Reconciliation:</strong> We’ll reconcile up to ${getFormattedValue('numBankAccounts', true)} business bank account(s) and ${getFormattedValue('numCreditCardAccounts', true)} business credit card account(s) monthly.</li>
+                  <li><strong>Cash Management:</strong> We’ll record cash transactions and deposits based on our defined process ("Recurring Transaction Template for Cash Deposits" SOP).</li>
+                  <li><strong>Sales Integration:</strong> We’ll record sales data and activity from any e-commerce platforms you use (like Square Site or Shopify).</li>
+                  <li><strong>Fee Tracking:</strong> We’ll record all relevant payment processing fees.</li>
+                  <li><strong>Reporting:</strong> We’ll generate your monthly Profit & Loss (Income Statement) and Balance Sheet reports.</li>
+                  <li><strong>Review Call:</strong> You get one (1) dedicated monthly review call (up to 30 minutes) to chat about your reports and answer any questions you have.</li>
+              </ul>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">B. What is Not Included:</h3>
+              <p style="font-size: 1rem; color: #1e293b; margin-bottom: 1rem;">
+                  To keep our focus sharp and our pricing clear, the following are not part of the Standard Monthly Services package unless we agree on a separate written add-on:
+              </p>
+              <ul style="list-style-type: disc; margin-left: 25px; margin-bottom: 1rem; font-size: 1rem; color: #1e293b;">
+                  <li>Tax Preparation/Filing: This includes income tax, payroll tax, or other compliance filings (Sales tax filing can be an add-on).</li>
+                  <li>Formal Audits: We do not provide auditing or assurance services.</li>
+                  <li>Advisory: This means financial planning or investment advice.</li>
+                  <li>Payroll: Payroll processing is excluded (unless specified as an an add-on).</li>
+                  <li>Legal Advice: We are bookkeepers, not lawyers!</li>
+                  <li>Inventory: Complex inventory management beyond basic QBO tracking (e.g., physical counts or advanced Cost of Goods Sold calculations).</li>
+                  <li>Historical Cleanup: Any work for periods before the "Go-Live" Date is quoted separately.</li>
+              </ul>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">C. Engagement Start Date ("Go-Live" Date):</h3>
+              <div style="margin-bottom: 1rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">We’ll start actively managing your books for the period beginning:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('goLiveDate', true)}</p></div>
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">2. What We Need From You (Client Responsibilities)</h2>
+              <ul style="list-style-type: disc; margin-left: 25px; margin-bottom: 1rem; font-size: 1rem; color: #1e293b;">
+                  <li><strong>Timeliness:</strong> Provide accurate financial information and documents right away when we ask for them (refer to "Bookkeeping Client Document Checklist").</li>
+                  <li><strong>Access:</strong> Grant us the necessary access to your QuickBooks Online, bank accounts, credit card accounts, POS systems, and other relevant platforms (following the "Secure Information Request & Access Instructions").</li>
+                  <li><strong>Communication:</strong> Respond quickly to our questions and requests for clarification.</li>
+                  <li><strong>Documentation:</strong> Ensure all receipts and financial documents are provided to us in an organized and timely manner.</li>
+                  <li><strong>Updates:</strong> Notify us immediately of any changes to bank accounts, credit cards, or systems that affect our access.</li>
+                  <li><strong>Review:</strong> Review the financial reports we send you and let us know about any questions or concerns within ${getFormattedValue('reviewDays', true)} days of receiving them.</li>
+              </ul>
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">3. Fees and Payment</h2>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">A. Monthly Retainer Fee:</h3>
+              <div style="margin-bottom: 1rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">You agree to pay a predictable monthly retainer fee of:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">$${getFormattedValue('monthlyFeeAmount', true)}</p></div>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">B. When and How to Pay:</h3>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">The monthly retainer fee is due in advance on the ${getFormattedValue('paymentDay', true)} of each month.</p></div>
+              <div style="margin-bottom: 1rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Payment will be made via:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('paymentMethod', true)}</p></div>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">C. Late Payments:</h3>
+              <ul style="list-style-type: disc; margin-left: 25px; margin-bottom: 1rem; font-size: 1rem; color: #1e293b;">
+                  <li>If a payment isn't received within ${getFormattedValue('latePaymentDays', true)} days of the due date, a late fee will be applied.</li>
+                  <li>This fee will be ${getFormattedValue('lateFeePercentage', true)}% of the outstanding balance or $${getFormattedValue('lateFeeFixedAmount', true)}, whichever is greater.</li>
+                  <li>If payment is delayed, we may need to pause our services until all outstanding invoices are cleared.</li>
+              </ul>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">D. Out-of-Scope Work:</h3>
+              <div style="margin-bottom: 1rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Hourly rate for out-of-scope work:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">$${getFormattedValue('hourlyRate', true)}</p></div>
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">4. Term and Ending Our Partnership</h2>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">A. Term:</h3>
+              <p style="font-size: 1rem; color: #1e293b; margin-bottom: 1rem; margin-left: 25px;">
+                  This Agreement starts on the Effective Date and continues month-to-month until either party decides to terminate it.
+              </p>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">B. Standard Termination:</h3>
+              <p style="font-size: 1rem; color: #1e293b; margin-bottom: 0.75rem; margin-left: 25px;">
+                  Either of us can end this Agreement by giving the other ${getFormattedValue('terminationNoticeDays', true)} days' written notice. When terminating, you agree to pay for all Services we've rendered up to the final date.
+              </p>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">C. Termination for Cause:</h3>
+              <p style="font-size: 1rem; color: #1e293b; margin-bottom: 1rem; margin-left: 25px;">
+                  The Bookkeeper reserves the right to end this Agreement immediately if certain situations arise, including, but not limited to: consistent failure to pay fees, consistently failing to provide necessary information, or if we suspect any illegal activity.
+              </p>
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">5. Confidentiality</h2>
+              <p style="font-size: 1rem; color: #1e293b; margin-bottom: 1rem;">
+                  We treat your business data like gold. The Bookkeeper promises to maintain strict confidentiality regarding all your financial and business information. We will not share this information with anyone else unless required by law or with your explicit, written permission.
+              </p>
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">6. Limitation of Liability</h2>
+              <p style="font-size: 1rem; color: #1e293b; margin-bottom: 1rem;">
+                  We promise to perform all Services professionally and diligently. However, we aren't responsible for errors or omissions that result from incomplete, inaccurate, or late information you provide to us. Our liability under this Agreement is limited to the fees you paid for the Services during the month when the error or omission occurred. We are not responsible for tax advice or any tax penalties you incur.
+              </p>
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">7. Governing Law</h2>
+              <p style="font-size: 1rem; color: #1e293b; margin-bottom: 1rem;">
+                  This Agreement is governed by the laws of the State of North Carolina.
+              </p>
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">8. Entire Agreement</h2>
+              <p style="font-size: 1rem; color: #1e293b; margin-bottom: 1rem;">
+                  This document, along with any attachments, represents the complete understanding between us. It replaces any previous conversations, agreements, or negotiations.
+              </p>
+
+              <h2 style="color: #1e293b; font-size: 1.75rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">Signatures</h2>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">Bookkeeper: The Xanikton Ledger</h3>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Name:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">Rochelle Hylton</p></div>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Title:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">Owner/President</p></div>
+              <h3 style="color: #1e293b; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">Client:</h3>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Client Contact Name (Printed):</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('clientSignatureName', true)}</p></div>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Client Title:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('clientSignatureTitle', true)}</p></div>
+              <div style="margin-bottom: 0.75rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Date:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('agreementDate', true)}</p></div>
+              <div style="margin-bottom: 1rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Client Signature:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${signatureHtml}</p></div>
+              <div style="margin-bottom: 1rem;"><p style="font-weight: 600; font-size: 0.9375rem; color: #475569; margin-bottom: 0.25rem;">Agreed to Terms:</p><p style="font-size: 1rem; color: #1e293b; padding-left: 10px; white-space: pre-wrap;">${getFormattedValue('agreeToTerms', true)}</p></div>
+            </div>`;
+
+          htmlContent += `</div>`;
+          return htmlContent;
+      }
+
+
+      // Event Listener for form submission
+      submitFormButton.addEventListener('click', async (event) => {
+          event.preventDefault();
+
+          if (validateForm()) {
+              if (!navigator.onLine) {
+                  alert('You are currently offline. Your data has been saved locally. Please submit when online.');
+                  return;
+              }
+
+              const pdfContentHtml = generatePdfContent();
+              const datedFilename = `${getFormattedDate()}_Xanikton_Partnership_Agreement.pdf`;
+              
+              const pdfOptions = {
+                  margin: 10,
+                  filename: datedFilename,
+                  image: { type: 'jpeg', quality: 0.98 },
+                  html2canvas: { scale: 2 },
+                  jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+              };
+
+              await html2pdf().from(pdfContentHtml).set(pdfOptions).save();
+
+              const emailRecipient = 'xaniktoncreations@gmail.com'; // Specific email for partnership agreements
+              const emailSubject = 'Completed Bookkeeping Partnership Agreement';
+              const clientCompanyName = document.getElementById('clientCompanyName').value || '[Client Company Name]';
+              const clientContactName = document.getElementById('clientContactName').value || '[Client Contact Name]';
+              const emailBodyMessage = `Dear Xanikton Ledger Team,\n\n${clientContactName} from ${clientCompanyName} has completed and signed the Bookkeeping Partnership Agreement. Please find the PDF document attached to this email.\n\nThank you!`;
+              const mailtoUri = `mailto:${emailRecipient}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBodyMessage)}`;
+
+              window.location.href = mailtoUri;
+              
+              if (submissionSuccessMessage) {
+                  submissionSuccessMessage.classList.remove('hidden');
+                  submissionSuccessMessage.style.display = 'block';
+                  autosaveStatus.textContent = 'Success! Your Partnership Agreement has been downloaded. Please manually attach the PDF file to the email draft that will now open.';
+              }
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+          } else {
+              alert('Please correct the errors in the form before submitting.');
+              const firstError = document.querySelector('.error-message:not(.hidden)');
+              if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+          }
+      });
+
+      // Event Listener for Print button
+      printFormButton.addEventListener('click', () => {
+          window.print();
+      });
+
+      // Event Listener for Clear Form button
+      clearFormButton.addEventListener('click', () => {
+          if (confirm('Are you sure you want to clear all form data? This cannot be undone.')) {
+              form.reset();
+              localStorage.removeItem(LOCAL_STORAGE_KEY);
+              localStorage.removeItem(PREFILL_STORAGE_KEY); // Also clear prefill data
+              updateConditionalFields(); // Reset conditional visibility
+              clearAllErrors(); // Clear all error messages
+              clearDrawnSignature(); // Clear the drawing pad
+              clearTypedSignature(); // Clear the typed signature
+              finalSignatureTypeInput.value = 'drawn'; // Reset to default
+              finalSignatureValueInput.value = '';
+              finalSignatureFontInput.value = '';
+              signatureMethodDrawRadio.checked = true; // Select draw method
+              toggleSignatureMethod(); // Update UI
+              if (autosaveVisual) autosaveVisual.classList.add('hidden'); // Hide autosave message
+              if (submissionSuccessMessage) submissionSuccessMessage.classList.add('hidden'); // Hide success message
+              autosaveStatus.textContent = ''; // Clear SR-only status
+              alert('All form data has been cleared.');
+          }
+      });
+
+      // Event Listener to dismiss success message
+      dismissSuccessMessageButton.addEventListener('click', () => {
+        if (submissionSuccessMessage) {
+          submissionSuccessMessage.classList.add('hidden');
+          submissionSuccessMessage.style.display = 'none';
+          autosaveStatus.textContent = ''; // Clear SR-only status
+        }
+      });
+
+      // Signature pad event listeners
+      signaturePadCanvas.addEventListener('mousedown', startDrawing);
+      signaturePadCanvas.addEventListener('mousemove', draw);
+      signaturePadCanvas.addEventListener('mouseup', stopDrawing);
+      signaturePadCanvas.addEventListener('mouseout', stopDrawing);
+
+      signaturePadCanvas.addEventListener('touchstart', startDrawing);
+      signaturePadCanvas.addEventListener('touchmove', draw);
+      signaturePadCanvas.addEventListener('touchend', stopDrawing);
+      signaturePadCanvas.addEventListener('touchcancel', stopDrawing);
+
+      clearDrawingButton.addEventListener('click', clearDrawnSignature);
+      saveDrawingButton.addEventListener('click', saveDrawnSignature); // Manual save for drawn signature
+
+      // Typed signature event listeners
+      typedSignatureText.addEventListener('input', saveTypedSignature);
+      typedSignatureFont.addEventListener('change', saveTypedSignature);
+      clearTypedSignatureButton.addEventListener('click', clearTypedSignature);
+      saveTypedSignatureButton.addEventListener('click', saveTypedSignature);
+
+      // Signature method toggle listeners
+      signatureMethodDrawRadio.addEventListener('change', toggleSignatureMethod);
+      signatureMethodTypeRadio.addEventListener('change', toggleSignatureMethod);
+
+
+      // Initial load:
+      document.addEventListener('DOMContentLoaded', () => {
+          storeOriginalRequired(); // Store original required states before modifying
+          // The form data is loaded inside checkClientAuthorization after successful auth
+          prefillClientData(); // Attempt to pre-fill client data
+          updateConditionalFields(); // Ensure conditional fields are correct on load
+          toggleSignatureMethod(); // Ensure correct signature method is visible
+
+          // Set current date for agreementDate by default
+          const agreementDateInput = document.getElementById('agreementDate');
+          if (agreementDateInput && !agreementDateInput.value) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months start at 0!
+            const dd = String(today.getDate()).padStart(2, '0');
+            agreementDateInput.value = `${yyyy}-${mm}-${dd}`;
+          }
+
+          // Set current date for effectiveDate by default
+          const effectiveDateInput = document.getElementById('effectiveDate');
+          if (effectiveDateInput && !effectiveDateInput.value) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months start at 0!
+            const dd = String(today.getDate()).padStart(2, '0');
+            effectiveDateInput.value = `${yyyy}-${mm}-${dd}`;
+          }
+
+          checkClientAuthorization(); // Check auth state on page load
+          clientAuthForm.addEventListener('submit', handleClientLogin);
+      });
+
+      // Listen for auth state changes (e.g., after magic link login)
+      supabase.auth.onAuthStateChange((event, session) => {
+          if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+              checkClientAuthorization();
+          }
+      });
+    </script>
+</body>
+</html>

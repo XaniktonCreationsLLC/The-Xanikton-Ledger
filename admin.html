@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xanikton Ledger - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-bg': '#f8fafc', // Slate-50
+                        'secondary-bg': '#e2e8f0', // Slate-200
+                        'primary-text': '#1e293b', // Slate-800
+                        'secondary-text': '#475569', // Slate-600
+                        'accent-500': '#3b82f6', // Blue-500
+                        'accent-600': '#2563eb', // Blue-600
+                        'accent-100': '#dbeafe', // Blue-100
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
+        .error-message { color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; }
+        .input-error { border-color: #ef4444; }
+        .input-error:focus { --tw-ring-color: #ef4444; --tw-border-color: #ef4444; }
+    </style>
+</head>
+<body class="bg-primary-bg text-primary-text antialiased font-sans flex items-center justify-center min-h-screen">
+    <div id="app" class="max-w-xl mx-auto w-full bg-white shadow-lg rounded-xl p-8 border border-gray-200">
+        <h1 class="text-3xl font-extrabold text-primary-text mb-6 text-center">Xanikton Ledger Admin</h1>
+
+        <!-- Supabase Login Form -->
+        <div id="auth-container">
+            <h2 class="text-2xl font-bold text-primary-text mb-4 text-center">Login</h2>
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-secondary-text mb-1">Email</label>
+                    <input
+                        id="email"
+                        type="email"
+                        placeholder="your@email.com"
+                        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm"
+                        required
+                    />
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-secondary-text mb-1">Password</label>
+                    <input
+                        id="password"
+                        type="password"
+                        placeholder="********"
+                        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm"
+                        required
+                    />
+                </div>
+                <button
+                    type="submit"
+                    class="w-full px-4 py-2 bg-accent-600 text-white font-semibold rounded-lg shadow-md hover:bg-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 transition duration-200 ease-in-out"
+                >
+                    Sign In
+                </button>
+                <div class="text-center mt-2">
+                    <a href="#" id="forgot-password" class="text-accent-600 hover:text-accent-500 text-sm">Forgot Password?</a>
+                </div>
+                <p id="auth-message" class="text-center mt-4 text-sm"></p>
+            </form>
+        </div>
+
+        <!-- Admin Panel (Visible after login) -->
+        <div id="admin-panel" class="hidden">
+            <p class="text-md text-secondary-text mb-4">Welcome, <span id="user-email" class="font-semibold"></span>!</p>
+            <button
+                id="logout-button"
+                class="mb-6 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200 ease-in-out text-sm"
+            >
+                Logout
+            </button>
+
+            <hr class="my-6 border-gray-200">
+
+            <h2 class="text-2xl font-bold text-primary-text mb-4">Manage Authorized Client Emails</h2>
+            <form id="add-email-form" class="space-y-4 mb-8">
+                <div>
+                    <label for="new-client-email" class="block text-sm font-medium text-secondary-text mb-1">Client Email to Authorize</label>
+                    <input
+                        id="new-client-email"
+                        type="email"
+                        placeholder="client@example.com"
+                        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500 sm:text-sm"
+                        required
+                    />
+                </div>
+                <button
+                    type="submit"
+                    class="w-full px-4 py-2 bg-accent-600 text-white font-semibold rounded-lg shadow-md hover:bg-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 transition duration-200 ease-in-out"
+                >
+                    Add Client Email
+                </button>
+                <p id="add-email-message" class="text-center mt-4 text-sm"></p>
+            </form>
+
+            <h3 class="text-xl font-semibold text-primary-text mb-3">Currently Authorized Emails</h3>
+            <ul id="authorized-emails-list" class="space-y-2 text-primary-text text-sm bg-secondary-bg p-4 rounded-md">
+                <li class="text-gray-500">Loading emails...</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Client Initialization
+        // IMPORTANT: Replace with your actual Supabase Project URL and Anon Key
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., 'https://abcde12345.supabase.co'
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // e.g., 'eyJhbGciOiJIUzI1Ni...'
+
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // DOM Elements
+        const authContainer = document.getElementById('auth-container');
+        const adminPanel = document.getElementById('admin-panel');
+        const authForm = document.getElementById('auth-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const authMessage = document.getElementById('auth-message');
+        const forgotPasswordLink = document.getElementById('forgot-password');
+        const userEmailSpan = document.getElementById('user-email');
+        const logoutButton = document.getElementById('logout-button');
+        const addEmailForm = document.getElementById('add-email-form');
+        const newClientEmailInput = document.getElementById('new-client-email');
+        const addEmailMessage = document.getElementById('add-email-message');
+        const authorizedEmailsList = document.getElementById('authorized-emails-list');
+
+        // --- Authentication Functions ---
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            authMessage.textContent = ''; // Clear previous messages
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                authMessage.textContent = `Login failed: ${error.message}`;
+                authMessage.style.color = '#ef4444';
+            } else {
+                authMessage.textContent = 'Logged in successfully!';
+                authMessage.style.color = '#10b981'; // Green
+                setTimeout(() => {
+                    checkUser(); // Re-check user to update UI
+                }, 500);
+            }
+        }
+
+        async function handleLogout() {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Logout error:', error.message);
+                alert('Failed to log out.');
+            } else {
+                alert('Logged out successfully.');
+                checkUser(); // Update UI to show login form
+            }
+        }
+
+        async function handleForgotPassword(event) {
+            event.preventDefault();
+            authMessage.textContent = '';
+            const email = emailInput.value;
+            if (!email) {
+                authMessage.textContent = 'Please enter your email to reset password.';
+                authMessage.style.color = '#ef4444';
+                return;
+            }
+
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/admin.html' // Redirect back to this page after reset
+            });
+
+            if (error) {
+                authMessage.textContent = `Password reset failed: ${error.message}`;
+                authMessage.style.color = '#ef4444';
+            } else {
+                authMessage.textContent = 'Password reset email sent. Check your inbox!';
+                authMessage.style.color = '#10b981';
+            }
+        }
+
+        // --- Admin Panel Functions ---
+
+        async function addClientEmail(event) {
+            event.preventDefault();
+            addEmailMessage.textContent = '';
+            const clientEmail = newClientEmailInput.value.trim();
+            if (!clientEmail) {
+                addEmailMessage.textContent = 'Please enter a client email.';
+                addEmailMessage.style.color = '#ef4444';
+                return;
+            }
+
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                addEmailMessage.textContent = 'You must be logged in to add emails.';
+                addEmailMessage.style.color = '#ef4444';
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('authorized_client_emails')
+                .insert([
+                    { email: clientEmail, created_by: user.id }
+                ]);
+
+            if (error) {
+                addEmailMessage.textContent = `Error adding email: ${error.message}`;
+                addEmailMessage.style.color = '#ef4444';
+            } else {
+                addEmailMessage.textContent = `'${clientEmail}' added successfully!`;
+                addEmailMessage.style.color = '#10b981';
+                newClientEmailInput.value = ''; // Clear input
+                loadAuthorizedEmails(); // Refresh the list
+            }
+        }
+
+        async function loadAuthorizedEmails() {
+            authorizedEmailsList.innerHTML = '<li class="text-gray-500">Loading emails...</li>';
+            const { data, error } = await supabase
+                .from('authorized_client_emails')
+                .select('email')
+                .order('email', { ascending: true }); // Order alphabetically
+
+            if (error) {
+                authorizedEmailsList.innerHTML = `<li class="text-red-500">Error loading emails: ${error.message}</li>`;
+            } else if (data && data.length > 0) {
+                authorizedEmailsList.innerHTML = data.map(item => `<li>${item.email}</li>`).join('');
+            } else {
+                authorizedEmailsList.innerHTML = '<li>No authorized emails found.</li>';
+            }
+        }
+
+        // --- UI State Management ---
+
+        async function checkUser() {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (user) {
+                authContainer.classList.add('hidden');
+                adminPanel.classList.remove('hidden');
+                userEmailSpan.textContent = user.email;
+                loadAuthorizedEmails();
+            } else {
+                authContainer.classList.remove('hidden');
+                adminPanel.classList.add('hidden');
+                authMessage.textContent = ''; // Clear any leftover messages
+            }
+        }
+
+        // --- Event Listeners ---
+        authForm.addEventListener('submit', handleLogin);
+        logoutButton.addEventListener('click', handleLogout);
+        forgotPasswordLink.addEventListener('click', handleForgotPassword);
+        addEmailForm.addEventListener('submit', addClientEmail);
+
+        // Initial check on page load
+        document.addEventListener('DOMContentLoaded', checkUser);
+
+        // Listen for auth state changes (e.g., after magic link login)
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+                checkUser();
+            }
+        });
+
+    </script>
+</body>
+</html>

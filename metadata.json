@@ -1,4 +1,5 @@
 {
-  "name": "Xanikton Creations LLC Bookkeeping Client Intake Form",
-  "description": "A comprehensive client intake form for Xanikton Creations LLC, designed to gather essential business, financial, and service needs information from new bookkeeping clients for efficient onboarding and service customization."
+  "name": "The Xanikton Ledger",
+  "description": "A comprehensive, two-stage client onboarding system for Xanikton Creations LLC. Includes an initial intake form to gather essential business and financial needs, followed by a Bookkeeping Partnership Agreement form, designed for efficient onboarding and service customization. Now with Supabase authentication and GitHub Pages deployment instructions.",
+  "requestFramePermissions": []
 }
