@@ -269,7 +269,7 @@
         // Initial check on page load
         document.addEventListener('DOMContentLoaded', checkUser);
 
-        // Listen for auth state changes (e.g., after magic link login)
+        // Listen for auth state changes (e.g., after Secure link login)
         supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
                 checkUser();

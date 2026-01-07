@@ -124,7 +124,7 @@
                 Welcome to The Xanikton Ledger Client Portal!
             </h1>
             <p class="text-lg text-secondary-text max-w-2xl mx-auto mb-6">
-                Please enter your email address to securely access your forms. We'll send you a magic link to log in instantly.
+                Please enter your email address to securely access your forms. We'll send you a Secure link to log in instantly.
             </p>
             <form id="client-auth-form" class="max-w-md mx-auto space-y-4">
                 <div>
@@ -141,7 +141,7 @@
                     type="submit"
                     class="w-full px-4 py-2 bg-accent-600 text-white font-semibold rounded-lg shadow-md hover:bg-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 transition duration-200 ease-in-out"
                 >
-                    Send Magic Link
+                    Send Secure Link
                 </button>
                 <p id="client-auth-message" class="text-center mt-4 text-sm"></p>
             </form>
@@ -1054,7 +1054,7 @@
               clientAuthMessage.textContent = `Login failed: ${error.message}`;
               clientAuthMessage.style.color = '#ef4444';
           } else {
-              clientAuthMessage.textContent = 'Magic link sent! Check your email to log in.';
+              clientAuthMessage.textContent = 'Secure link sent! Check your email to log in.';
               clientAuthMessage.style.color = '#10b981'; // Green
           }
       }
@@ -1702,7 +1702,7 @@
           // The form data is loaded inside checkClientAuthorization after successful auth
       });
 
-      // Listen for auth state changes (e.g., after magic link login)
+      // Listen for auth state changes (e.g., after Secure link login)
       supabase.auth.onAuthStateChange((event, session) => {
           if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
               checkClientAuthorization();
